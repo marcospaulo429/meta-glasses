@@ -11,7 +11,8 @@ class VoiceCommandDetector(
     private val onStopCommand: () -> Unit = {},
 ) {
     companion object {
-        private val PHOTO_KEYWORDS = listOf("registrar imagem", "tirar foto", "capturar imagem")
+        // Prefixos tolerantes a erros do ASR (teste 15/08: "imagem" transcrito como "image")
+        private val PHOTO_KEYWORDS = listOf("registrar ima", "tirar foto", "capturar ima")
         private val STOP_KEYWORDS = listOf("encerrar consulta", "finalizar consulta")
 
         fun normalize(text: String): String =

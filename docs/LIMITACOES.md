@@ -48,8 +48,9 @@
 |---|---|---|---|---|
 | IA-01 | **Muse Glimmer (30B) NÃO roda em smartphone** — quantizado ainda exige ~17–20 GB + KV cache (24–32 GB de envelope) | Não é opção para o pipeline clínico on-device | Manter Gemma 3n E2B/E4B como candidato; Muse Glimmer pode servir no notebook como LLM-as-a-judge para avaliar rascunhos SOAP em desenvolvimento | 🟢 (avaliado 15/08) |
 | IA-02 | LLM pode alucinar fatos clínicos | Risco inaceitável em prontuário | Pipeline extração factual → estruturação; saída JSON estrita; provenance por fato; métrica unsupported-statement-rate; revisão humana obrigatória | 🟡 |
-| IA-03 | ASR PT-BR com fala médica (fármacos, doses) é difícil, pior com HFP | Transcrição errada = prontuário errado | Benchmark WER/CER + acurácia de entidades (medicamento, dose, PA); vocabulário/boost de termos médicos; campos "incerto" | 🔴 |
+| IA-03 | ASR PT-BR com fala médica (fármacos, doses) é difícil, pior com HFP | Transcrição errada = prontuário errado | **Evidência medida (15/08, emulador, vosk-small-pt-0.3, áudio TTS limpo 16 kHz): "cefaleia tensional"→"intencional", "dipirona quinhentos miligramas"→"de quinhentos mil e grande", "imagem"→"image".** Mitigações: modelo maior (vosk-model-pt-fb ou whisper small), boost de vocabulário médico, campos "incerto", comandos de voz por prefixo tolerante | 🟡 (medido; modelo small insuficiente p/ fármacos) |
 | IA-04 | Latência e RAM do LLM no smartphone do hackathon (desconhecido) | Pode não caber ou ser lento demais | Benchmark no aparelho real; plano B: modelo menor ou estruturação em lote pós-consulta (não precisa ser tempo real) | 🔴 |
+| IA-05 | **Vosk segmenta sentenças mal em fala contínua sem pausas** (teste 15/08: consulta de 44s virou 3 segmentos longos) — fatos ficam grandes demais para classificação SOAP fina | Rascunho com blocos multi-assunto na seção errada | Segmentação secundária por marcadores linguísticos antes da classificação; fala real tem mais pausas que TTS; LLM local resolverá na Fase B | 🟡 |
 
 ## 5. Políticas Meta (Acceptable Use Policy + Developer Terms)
 

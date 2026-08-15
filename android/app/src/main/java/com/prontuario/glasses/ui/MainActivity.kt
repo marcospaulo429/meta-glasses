@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.switchmaterial.SwitchMaterial
+import com.prontuario.glasses.BuildConfig
 import com.prontuario.glasses.capture.ConsultationCaptureService
 import com.prontuario.glasses.capture.ServiceBus
 import com.prontuario.glasses.config.FeatureFlags
@@ -69,6 +70,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         requestPermissionsIfNeeded()
+
+        // HARNESS (debug): adb shell am start ... --ez auto_start true
+        if (BuildConfig.DEBUG && intent.getBooleanExtra("auto_start", false)) {
+            patientConsent.isChecked = true
+            startCapture()
+        }
     }
 
     private fun startCapture() {

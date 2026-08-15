@@ -14,12 +14,14 @@ import android.os.IBinder
 import android.speech.tts.TextToSpeech
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import com.prontuario.glasses.BuildConfig
 import com.prontuario.glasses.R
 import com.prontuario.glasses.asr.StreamingTranscriber
 import com.prontuario.glasses.asr.VoiceCommandDetector
 import com.prontuario.glasses.asr.VoskSpeechPort
 import com.prontuario.glasses.audio.AudioRouteManager
 import com.prontuario.glasses.audio.ConsultationAudioRecorder
+import com.prontuario.glasses.audio.WavReplayAudioSource
 import com.prontuario.glasses.config.FeatureFlags
 import com.prontuario.glasses.device.DeviceGateway
 import com.prontuario.glasses.device.GatewayFactory
@@ -109,6 +111,7 @@ class ConsultationCaptureService : Service() {
 
     private var transcriber: StreamingTranscriber? = null
     private val segments = mutableListOf<TranscriptSegment>()
+    private var replaySource: WavReplayAudioSource? = null
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -177,7 +180,12 @@ class ConsultationCaptureService : Service() {
             onPhotoCommand = { capturePhotoByVoice() },
             onStopCommand = { stop(applicationContext) },
         )
-        val speechPort = VoskSpeechPort.tryCreate(File(getExternalFilesDir(null), "models/vosk-pt"))
+        // Interno primeiro (run-as/instalação pelo app); externo como conveniência de adb push
+        val modelDir = listOf(
+            File(filesDir, "models/vosk-pt"),
+            File(getExternalFilesDir(null), "models/vosk-pt"),
+        ).firstOrNull { it.isDirectory && !it.listFiles().isNullOrEmpty() }
+        val speechPort = modelDir?.let { VoskSpeechPort.tryCreate(it) }
         transcriber = speechPort?.let { port ->
             StreamingTranscriber(
                 port = port,
@@ -194,29 +202,44 @@ class ConsultationCaptureService : Service() {
         }
 
         // Rota HFP primeiro, câmera depois (MEMORY.md §4: ordem de inicialização)
-        val scoOk = routeManager.selectBluetoothScoRoute()
-        if (!scoOk) {
-            ladder.onDeviceLost()
-            speak("Óculos não encontrados. Usando microfone do telefone.")
-        }
-
-        recorder = ConsultationAudioRecorder { buffer, read ->
-            pcmBuffer.append(buffer, read)
-            transcriber?.feed(buffer, read)
-        }
-        if (recorder?.start() != true) {
-            Log.e(TAG, "AudioRecord falhou; abortando consulta")
-            repository.discard(created)
-            stopForeground(STOP_FOREGROUND_REMOVE)
-            stopSelf()
-            return
+        val replayWav = File(getExternalFilesDir(null), "test_input.wav")
+        val useReplay = BuildConfig.DEBUG && replayWav.exists()
+        val scoOk: Boolean
+        if (useReplay) {
+            scoOk = false
+            Log.i(TAG, "HARNESS: reproduzindo ${replayWav.name} no lugar do microfone")
+            replaySource = WavReplayAudioSource(
+                wavFile = replayWav,
+                onPcm = { buffer, read ->
+                    pcmBuffer.append(buffer, read)
+                    transcriber?.feed(buffer, read)
+                },
+                onFinished = { stop(applicationContext) },
+            ).also { it.start() }
+        } else {
+            scoOk = routeManager.selectBluetoothScoRoute()
+            if (!scoOk) {
+                ladder.onDeviceLost()
+                speak("Óculos não encontrados. Usando microfone do telefone.")
+            }
+            recorder = ConsultationAudioRecorder { buffer, read ->
+                pcmBuffer.append(buffer, read)
+                transcriber?.feed(buffer, read)
+            }
+            if (recorder?.start() != true) {
+                Log.e(TAG, "AudioRecord falhou; abortando consulta")
+                repository.discard(created)
+                stopForeground(STOP_FOREGROUND_REMOVE)
+                stopSelf()
+                return
+            }
         }
 
         ServiceBus.update {
             it.copy(
                 running = true,
                 encounterId = created.id,
-                route = routeManager.currentRouteLabel(),
+                route = if (useReplay) "replay de teste (WAV)" else routeManager.currentRouteLabel(),
                 ladder = ladder.level.value,
                 asrAvailable = transcriber != null,
                 phoneBatteryStartPct = phoneBatteryPct(),
@@ -394,6 +417,8 @@ class ConsultationCaptureService : Service() {
     private fun stopCapture() {
         chunkJob?.cancel()
         stopSecurityVideo()
+        replaySource?.stop()
+        replaySource = null
         recorder?.stop()
         recorder = null
         rotateAudioChunk()
@@ -426,6 +451,9 @@ class ConsultationCaptureService : Service() {
         val facts = runBlocking { PassthroughFactExtractor().extract(enc.id, snapshot) }
         val note = HeuristicSoapClassifier.classify(enc.id, facts)
         val validation = ProvenanceValidator.validate(note, snapshot)
+        if (BuildConfig.DEBUG) {
+            Log.i(TAG, "HARNESS draft: " + SoapJson.noteToJson(note, validation).toString(2))
+        }
 
         repository.saveDocument(
             enc, "transcript", SoapJson.transcriptToJson(snapshot).toString(2).toByteArray(),

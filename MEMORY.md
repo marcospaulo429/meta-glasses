@@ -94,6 +94,13 @@ SOAP: extração factual → classificador heurístico (zero alucinação por co
 Segurança: modo blindado do vídeo (RecoveryOnly) · crypto-erasure por tipo · gaps documentados · auditoria hash-encadeada · telemetria de bateria do telefone.
 UI: consentimento bloqueante · status ao vivo · revisão com confirmar/descartar/erase/verificar auditoria.
 
+### 7.2 Teste fim-a-fim no EMULADOR (15/08 — pipeline inteiro validado)
+
+Setup reproduzível: AVD `prontuario_test` (Pixel 7, API 35 arm64) · áudio de consulta gerado com `say -v Luciana` (44s, WAV 16 kHz) · modelo vosk-small-pt via `run-as` em `filesDir/models/vosk-pt` · harness `WavReplayAudioSource` + `--ez auto_start true`.
+**Resultado**: Vosk transcreveu de verdade → 3 fatos com proveniência (timestamps reais) → SOAP S/P classificado → validação passou (0% unsupported) → TTS falou resumo → `audio_0.enc`, `photo_0.enc` (foto disparada POR VOZ), `transcript.enc`, `soap_draft.enc` cifrados + auditoria íntegra com bateria auditada.
+**Achados novos**: IA-03 medido (vosk-small erra fármacos: "cefaleia intencional", "dipirona"→"de quinhentos mil e grande") · IA-05 novo (segmentação pobre sem pausas) · comandos de voz agora por prefixo tolerante ("registrar ima").
+Gotchas de emulador: não pipe o processo do emulator (`| head` mata com SIGPIPE) · adb push em `/sdcard/Android/data` fica invisível pro app (FUSE) — usar `run-as` + filesDir interno · exportar JAVA_HOME em todo terminal novo.
+
 ## 8. Convenções do repositório
 
 - Documentação de planejamento em `docs/` (Markdown).

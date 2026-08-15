@@ -58,6 +58,7 @@ dependencies {
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.coroutines.android)
+    implementation(libs.vosk.android)
 
     "datImplementation"(libs.mwdat.core)
     "datImplementation"(libs.mwdat.camera)

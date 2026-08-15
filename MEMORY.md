@@ -77,11 +77,22 @@ Proposta original do time: vídeo contínuo em baixa qualidade como proteção m
 - [ ] Ler skill `camera-streaming` e discussão #136 em detalhe.
 - [ ] Preparar documento de Entrega Final (prazo 22/08) no template da organização.
 - [ ] Definir metas numéricas: WER alvo do ASR, unsupported-statement-rate alvo do LLM.
-- [ ] Roteiro de demo do hackathon (consulta simulada de 5 min) — mapear para os 5 checkpoints.
-- [ ] GitHub token + conta Wearables Developer Center (DAT-08) — **confirmado ausente na máquina em 15/08; flavor `dat` não compila até resolver**.
+- [x] Roteiro de demo: o app já sustenta consulta simulada fim-a-fim no flavor `sim` (falta ensaiar).
+- [ ] GitHub token + conta Wearables Developer Center (DAT-08/AND-07) — **único bloqueio do flavor `dat`**.
 - [ ] Conectar MCP de docs da Meta no VS Code: https://mcp.developer.meta.com/wearables
-- [ ] **Time decidir a disputa da gravação de segurança (§4.1) antes de 22/08.**
+- [x] Disputa da gravação de segurança resolvida como MODO BLINDADO (§4.1).
 - [ ] Verificar formato do `videoStream` (DAT-10): frames decodificados vs bitstream HEVC.
+- [ ] Instalar modelo Vosk num aparelho físico e medir WER PT-BR (scripts/install-vosk-model.sh).
+- [ ] Benchmark LLM local (Gemma 3n) para substituir o classificador heurístico (IA-04).
+- [ ] Edição campo a campo na tela de revisão (hoje: confirmar/descartar/erase).
+
+### 7.1 Implementado e testado (15/08, flavor `sim`, 32+ testes verdes)
+
+Captura: FGS mic+connectedDevice · rota HFP · AudioRecord 16 kHz · chunks 60s AES-GCM · escada L0–L4.
+ASR: Vosk PT-BR streaming com timestamps por palavra · comandos de voz ("registrar imagem", "encerrar consulta") · app funciona sem modelo (degradação limpa).
+SOAP: extração factual → classificador heurístico (zero alucinação por construção) → validador de proveniência (unsupported-statement-rate) → rascunho cifrado.
+Segurança: modo blindado do vídeo (RecoveryOnly) · crypto-erasure por tipo · gaps documentados · auditoria hash-encadeada · telemetria de bateria do telefone.
+UI: consentimento bloqueante · status ao vivo · revisão com confirmar/descartar/erase/verificar auditoria.
 
 ## 8. Convenções do repositório
 

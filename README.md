@@ -32,4 +32,4 @@ Flavor `dat` (integração real) exige: `github_token` (escopo `read:packages`) 
 
 ## Estado atual
 
-**Implementação iniciada em 15/08** (branch `dev/marcos`): captura de áudio com chunks criptografados, escada de degradação de energia, cofre AES-GCM/Keystore, log de auditoria hash-encadeado, gravação de segurança em vídeo **atrás de feature flag desligada** (disputa em aberto — [MEMORY.md](MEMORY.md) §4.1). Próximos marcos: Entrega Final da Ideia (**22/08**), Hackathon (**18/09**, Meta SP).
+**MVP `sim` funcional (15/08)**: consulta fim-a-fim sem óculos — áudio cifrado por chunks, ASR PT-BR (Vosk) com comandos de voz, rascunho SOAP com validação anti-alucinação, vídeo blindado opcional (indecifrável no aparelho; só custodiante com ordem judicial), crypto-erasure, auditoria hash-encadeada e tela de revisão. Modelo ASR: `scripts/install-vosk-model.sh`. Flavor `dat` aguarda token/credenciais (AND-07). Próximos marcos: Entrega Final da Ideia (**22/08**), Hackathon (**18/09**, Meta SP).

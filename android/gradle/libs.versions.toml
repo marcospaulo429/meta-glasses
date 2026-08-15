@@ -1,0 +1,24 @@
+[versions]
+agp = "8.11.1"
+kotlin = "2.2.21"
+coroutines = "1.8.1"
+coreKtx = "1.13.1"
+appcompat = "1.7.0"
+material = "1.12.0"
+mwdat = "0.9.0"
+
+[libraries]
+core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
+coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
+junit = { group = "junit", name = "junit", version = "4.13.2" }
+json-jvm = { group = "org.json", name = "json", version = "20240303" }
+mwdat-core = { group = "com.meta.wearable", name = "mwdat-core", version.ref = "mwdat" }
+mwdat-camera = { group = "com.meta.wearable", name = "mwdat-camera", version.ref = "mwdat" }
+mwdat-mockdevice = { group = "com.meta.wearable", name = "mwdat-mockdevice", version.ref = "mwdat" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

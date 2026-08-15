@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- DAT usa a câmera dos óculos, mas o SDK declara CAMERA no fluxo de permissão -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+
+    <application>
+        <meta-data
+            android:name="com.meta.wearable.mwdat.APPLICATION_ID"
+            android:value="${mwdat_application_id}" />
+        <meta-data
+            android:name="com.meta.wearable.mwdat.CLIENT_TOKEN"
+            android:value="${mwdat_client_token}" />
+        <!-- DAT-09: telemetria e crash reporting do SDK desligados (docs/LGPD.md §5) -->
+        <meta-data
+            android:name="com.meta.wearable.mwdat.ANALYTICS_OPT_OUT"
+            android:value="true" />
+        <meta-data
+            android:name="com.meta.wearable.mwdat.CRASH_REPORTING_OPT_OUT"
+            android:value="true" />
+    </application>
+</manifest>

@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Prontuário Glasses</string>
+    <string name="notification_channel_name">Consulta em andamento</string>
+    <string name="notification_channel_description">Indica que há captura de consulta ativa</string>
+    <!-- Notificação sem conteúdo clínico (docs/LGPD.md §5) -->
+    <string name="notification_title">Captura de consulta ativa</string>
+    <string name="notification_text">Toque para abrir o painel</string>
+</resources>

@@ -3,6 +3,16 @@ __pycache__/
 *.py[codz]
 *$py.class
 
+# Vendored reference clones (not part of this repo)
+vendor/
+
+# Android
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/.kotlin/
+
 # C extensions
 *.so
 

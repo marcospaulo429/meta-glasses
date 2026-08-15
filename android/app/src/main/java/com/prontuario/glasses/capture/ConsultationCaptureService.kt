@@ -8,11 +8,16 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
+import android.graphics.Bitmap
+import android.os.BatteryManager
 import android.os.IBinder
 import android.speech.tts.TextToSpeech
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.prontuario.glasses.R
+import com.prontuario.glasses.asr.StreamingTranscriber
+import com.prontuario.glasses.asr.VoiceCommandDetector
+import com.prontuario.glasses.asr.VoskSpeechPort
 import com.prontuario.glasses.audio.AudioRouteManager
 import com.prontuario.glasses.audio.ConsultationAudioRecorder
 import com.prontuario.glasses.config.FeatureFlags
@@ -23,6 +28,11 @@ import com.prontuario.glasses.encounter.ChunkKind
 import com.prontuario.glasses.encounter.ConsentRecord
 import com.prontuario.glasses.encounter.Encounter
 import com.prontuario.glasses.encounter.EncounterRepository
+import com.prontuario.glasses.soap.HeuristicSoapClassifier
+import com.prontuario.glasses.soap.PassthroughFactExtractor
+import com.prontuario.glasses.soap.ProvenanceValidator
+import com.prontuario.glasses.soap.SoapJson
+import com.prontuario.glasses.soap.TranscriptSegment
 import com.prontuario.glasses.ui.MainActivity
 import com.prontuario.glasses.vault.RecoveryKeyStore
 import com.prontuario.glasses.vault.SecurityVault
@@ -91,10 +101,14 @@ class ConsultationCaptureService : Service() {
     private val pcmBuffer = PcmChunkBuffer()
     private var audioSeq = 0
     private var videoSeq = 0
+    private var photoSeq = 0
     private var chunkJob: Job? = null
     private var videoJob: Job? = null
     private var videoChunkFile: File? = null
     private var videoChunkStream: DataOutputStream? = null
+
+    private var transcriber: StreamingTranscriber? = null
+    private val segments = mutableListOf<TranscriptSegment>()
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -153,6 +167,31 @@ class ConsultationCaptureService : Service() {
         }
         encounter = created
         ladder.resetManually()
+        segments.clear()
+        audioSeq = 0
+        videoSeq = 0
+        photoSeq = 0
+
+        // ASR opcional: sem modelo Vosk instalado o app segue capturando (IA-03)
+        val commandDetector = VoiceCommandDetector(
+            onPhotoCommand = { capturePhotoByVoice() },
+            onStopCommand = { stop(applicationContext) },
+        )
+        val speechPort = VoskSpeechPort.tryCreate(File(getExternalFilesDir(null), "models/vosk-pt"))
+        transcriber = speechPort?.let { port ->
+            StreamingTranscriber(
+                port = port,
+                onSegment = { segment ->
+                    synchronized(segments) { segments.add(segment) }
+                    ServiceBus.update { it.copy(segments = segments.size, partialText = "") }
+                },
+                onPartial = { partial ->
+                    commandDetector.onPartial(partial)
+                    ServiceBus.update { it.copy(partialText = partial) }
+                },
+                onUtteranceEnd = commandDetector::onUtteranceEnd,
+            )
+        }
 
         // Rota HFP primeiro, câmera depois (MEMORY.md §4: ordem de inicialização)
         val scoOk = routeManager.selectBluetoothScoRoute()
@@ -161,7 +200,10 @@ class ConsultationCaptureService : Service() {
             speak("Óculos não encontrados. Usando microfone do telefone.")
         }
 
-        recorder = ConsultationAudioRecorder { buffer, read -> pcmBuffer.append(buffer, read) }
+        recorder = ConsultationAudioRecorder { buffer, read ->
+            pcmBuffer.append(buffer, read)
+            transcriber?.feed(buffer, read)
+        }
         if (recorder?.start() != true) {
             Log.e(TAG, "AudioRecord falhou; abortando consulta")
             repository.discard(created)
@@ -176,6 +218,9 @@ class ConsultationCaptureService : Service() {
                 encounterId = created.id,
                 route = routeManager.currentRouteLabel(),
                 ladder = ladder.level.value,
+                asrAvailable = transcriber != null,
+                phoneBatteryStartPct = phoneBatteryPct(),
+                draftReady = false,
             )
         }
 
@@ -214,8 +259,43 @@ class ConsultationCaptureService : Service() {
         }
         repository.auditLog.append(
             "capture_started",
-            JSONObject().put("encounterId", created.id).put("scoRoute", scoOk),
+            JSONObject()
+                .put("encounterId", created.id)
+                .put("scoRoute", scoOk)
+                .put("asrAvailable", transcriber != null)
+                .put("phoneBatteryPct", phoneBatteryPct()),
         )
+    }
+
+    /** Checkpoint "Eficiência de bateria": telemetria do telefone por consulta. */
+    private fun phoneBatteryPct(): Int =
+        getSystemService(BatteryManager::class.java)
+            ?.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY) ?: -1
+
+    /** "Registrar imagem" → foto pontual cifrada vinculada ao encontro (câmera como evento). */
+    private fun capturePhotoByVoice() {
+        val enc = encounter ?: return
+        val gw = gateway ?: return
+        scope.launch {
+            gw.capturePhoto()
+                .onSuccess { bitmap ->
+                    val seq = photoSeq++
+                    val plain = File(enc.dir, "photo_$seq.tmp")
+                    plain.outputStream().use { bitmap.compress(Bitmap.CompressFormat.JPEG, 90, it) }
+                    val encrypted = File(enc.dir, "photo_$seq.enc")
+                    val crypto = SecurityVault.encryptFile(
+                        plain, encrypted, repository.aadFor(enc.id, seq),
+                    )
+                    plain.delete()
+                    repository.addChunk(enc, ChunkKind.PHOTO, seq, encrypted, crypto)
+                    ServiceBus.update { it.copy(photos = seq + 1) }
+                    speak("Imagem registrada.")
+                }
+                .onFailure {
+                    Log.w(TAG, "capturePhoto falhou: ${it.message}")
+                    speak("Não foi possível registrar a imagem.")
+                }
+        }
     }
 
     /** EM DISPUTA (MEMORY.md §4.1): só executa com flag ligada + consentimento específico. */
@@ -317,15 +397,49 @@ class ConsultationCaptureService : Service() {
         recorder?.stop()
         recorder = null
         rotateAudioChunk()
+        transcriber?.let {
+            it.finish()
+            it.close()
+        }
+        transcriber = null
         runBlocking { gateway?.stopSession() }
         gateway = null
         routeManager.release()
-        encounter?.let {
-            repository.auditLog.append("capture_stopped", JSONObject().put("encounterId", it.id))
+        encounter?.let { enc ->
+            generateDraft(enc)
+            repository.auditLog.append(
+                "capture_stopped",
+                JSONObject().put("encounterId", enc.id).put("phoneBatteryPct", phoneBatteryPct()),
+            )
         }
         encounter = null
-        speak("Consulta encerrada.")
         ServiceBus.update { it.copy(running = false) }
+    }
+
+    /** Pipeline anti-alucinação: transcrição → fatos → SOAP → validação de proveniência. */
+    private fun generateDraft(enc: Encounter) {
+        val snapshot = synchronized(segments) { segments.toList() }
+        if (snapshot.isEmpty()) {
+            speak("Consulta encerrada. Sem transcrição disponível.")
+            return
+        }
+        val facts = runBlocking { PassthroughFactExtractor().extract(enc.id, snapshot) }
+        val note = HeuristicSoapClassifier.classify(enc.id, facts)
+        val validation = ProvenanceValidator.validate(note, snapshot)
+
+        repository.saveDocument(
+            enc, "transcript", SoapJson.transcriptToJson(snapshot).toString(2).toByteArray(),
+        )
+        repository.saveDocument(
+            enc, "soap_draft", SoapJson.noteToJson(note, validation).toString(2).toByteArray(),
+        )
+        ServiceBus.update { it.copy(draftReady = true) }
+
+        val uncertain = facts.count { it.status.name == "UNCERTAIN" }
+        speak(
+            "Consulta encerrada. Rascunho pronto com ${facts.size} fatos" +
+                if (uncertain > 0) ", $uncertain para revisar." else ".",
+        )
     }
 
     private fun speak(text: String) {

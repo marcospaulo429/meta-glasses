@@ -16,6 +16,12 @@ object ServiceBus {
         val videoChunks: Int = 0,
         val videoActive: Boolean = false,
         val lastEvent: String = "-",
+        val asrAvailable: Boolean = false,
+        val partialText: String = "",
+        val segments: Int = 0,
+        val photos: Int = 0,
+        val phoneBatteryStartPct: Int = -1,
+        val draftReady: Boolean = false,
     )
 
     private val _status = MutableStateFlow(CaptureStatus())

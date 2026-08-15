@@ -25,6 +25,10 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ui.ReviewActivity"
+            android:exported="false" />
+
         <!-- AND-01: FGS microphone só pode iniciar com Activity visível (Android 14+) -->
         <service
             android:name=".capture.ConsultationCaptureService"

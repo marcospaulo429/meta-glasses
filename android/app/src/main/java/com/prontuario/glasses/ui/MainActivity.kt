@@ -1,6 +1,7 @@
 package com.prontuario.glasses.ui
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
@@ -51,11 +52,15 @@ class MainActivity : AppCompatActivity() {
             ServiceBus.status.collect { status ->
                 statusView.text = buildString {
                     appendLine("Em captura: ${if (status.running) "SIM" else "não"}")
-                    appendLine("Consulta: ${status.encounterId ?: "-"}")
+                    appendLine("Consulta: ${status.encounterId?.take(8) ?: "-"}")
                     appendLine("Rota de áudio: ${status.route}")
+                    appendLine("ASR: ${if (status.asrAvailable) "ativo" else "modelo não instalado (scripts/install-vosk-model.sh)"}")
                     appendLine("Nível de energia: ${status.ladder.name} — ${status.ladder.description}")
-                    appendLine("Chunks de áudio: ${status.audioChunks}")
-                    appendLine("Vídeo de segurança: ${if (status.videoActive) "ativo (${status.videoChunks} chunks)" else "desligado"}")
+                    appendLine("Bateria do telefone no início: ${if (status.phoneBatteryStartPct >= 0) "${status.phoneBatteryStartPct}%" else "-"}")
+                    appendLine("Chunks de áudio: ${status.audioChunks} · Segmentos: ${status.segments} · Fotos: ${status.photos}")
+                    appendLine("Vídeo de segurança: ${if (status.videoActive) "ativo (${status.videoChunks} chunks, blindado)" else "desligado"}")
+                    appendLine("Rascunho: ${if (status.draftReady) "pronto para revisão ✅" else "-"}")
+                    if (status.partialText.isNotBlank()) appendLine("Ouvindo: “${status.partialText}”")
                     appendLine("Último evento: ${status.lastEvent}")
                 }
                 startButton.isEnabled = !status.running && hasAudioPermission()
@@ -124,6 +129,10 @@ class MainActivity : AppCompatActivity() {
             text = "Encerrar consulta"
             isEnabled = false
         }
+        val reviewButton = Button(this).apply {
+            text = "Revisar última consulta"
+            setOnClickListener { startActivity(Intent(context, ReviewActivity::class.java)) }
+        }
         statusView = TextView(this).apply {
             text = "Pronto."
             setPadding(0, dp(16), 0, 0)
@@ -143,6 +152,7 @@ class MainActivity : AppCompatActivity() {
             addView(custodianButton)
             addView(startButton)
             addView(stopButton)
+            addView(reviewButton)
             addView(statusView)
         }
         return ScrollView(this).apply { addView(column) }

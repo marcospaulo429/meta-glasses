@@ -230,6 +230,18 @@ class EncounterRepository(
         auditLog.append("encounter_discarded", JSONObject().put("encounterId", encounter.id))
     }
 
+    /** Temp órfão de crash nunca é aproveitado (spec §4): apagar no próximo boot do serviço. */
+    fun cleanupOrphans(): Int {
+        var cleaned = 0
+        root.listFiles()?.forEach { dir ->
+            dir.listFiles { f -> f.name.endsWith(".tmp") }?.forEach { orphan ->
+                if (orphan.delete()) cleaned++
+            }
+        }
+        if (cleaned > 0) auditLog.append("orphans_cleaned", JSONObject().put("count", cleaned))
+        return cleaned
+    }
+
     fun aadFor(encounterId: String, seq: Int): ByteArray = "$encounterId:$seq".toByteArray()
 
     private fun docAad(encounterId: String, name: String): ByteArray =

@@ -118,6 +118,7 @@ class ConsultationCaptureService : Service() {
     override fun onCreate() {
         super.onCreate()
         repository = EncounterRepository(this)
+        repository.cleanupOrphans()
         routeManager = AudioRouteManager(this)
         tts = TextToSpeech(this) { status ->
             if (status == TextToSpeech.SUCCESS) tts?.language = Locale("pt", "BR")

@@ -30,6 +30,8 @@ export ANDROID_HOME=/opt/homebrew/share/android-commandlinetools
 
 Flavor `dat` (integração real) exige: `github_token` (escopo `read:packages`) em `android/local.properties` + `mwdatAppId`/`mwdatClientToken` do [Wearables Developer Center](https://wearables.developer.meta.com/) via `-P` ou `gradle.properties` — ver AND-07/DAT-08 em [docs/LIMITACOES.md](docs/LIMITACOES.md).
 
+**Guia de testes** (emulador · celular físico · óculos no hackathon): [android/TESTING.md](android/TESTING.md).
+
 ## Estado atual
 
 **MVP `sim` funcional (15/08)**: consulta fim-a-fim sem óculos — áudio cifrado por chunks, ASR PT-BR (Vosk) com comandos de voz, rascunho SOAP com validação anti-alucinação, vídeo blindado opcional (indecifrável no aparelho; só custodiante com ordem judicial), crypto-erasure, auditoria hash-encadeada e tela de revisão. Modelo ASR: `scripts/install-vosk-model.sh`. Flavor `dat` aguarda token/credenciais (AND-07). Próximos marcos: Entrega Final da Ideia (**22/08**), Hackathon (**18/09**, Meta SP).

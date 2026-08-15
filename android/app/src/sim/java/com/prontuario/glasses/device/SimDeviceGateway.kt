@@ -17,8 +17,9 @@ import kotlinx.coroutines.flow.flow
 /**
  * Gateway simulado (flavor sim): valida pipeline de chunks/cofre/escada sem óculos nem token
  * (PRG-01, AND-07). NÃO valida coexistência BT — isso só no hardware real (DAT-04).
+ * [thermalAfterMs]: injeta THERMAL_CRITICAL após N ms de vídeo (teste da escada ao vivo).
  */
-class SimDeviceGateway : DeviceGateway {
+class SimDeviceGateway(private val thermalAfterMs: Long? = null) : DeviceGateway {
 
     private val _sessionState = MutableStateFlow(GatewaySessionState.IDLE)
     override val sessionState: StateFlow<GatewaySessionState> = _sessionState.asStateFlow()
@@ -37,6 +38,7 @@ class SimDeviceGateway : DeviceGateway {
     override val videoFrames: Flow<CompressedFrame> = flow {
         var pts = 0L
         var counter = 0
+        var thermalFired = false
         while (_isVideoActive.value) {
             val intervalUs = 1_000_000L / videoConfig.frameRate
             // Payload sintético (~2 KB) só para exercitar chunking/cifra; formato real depende de DAT-10
@@ -52,6 +54,10 @@ class SimDeviceGateway : DeviceGateway {
             )
             counter++
             pts += intervalUs
+            if (!thermalFired && thermalAfterMs != null && pts / 1000 >= thermalAfterMs) {
+                thermalFired = true
+                _events.tryEmit(GatewayEvent.ThermalWarning(level = 2))
+            }
             delay(intervalUs / 1000)
         }
     }

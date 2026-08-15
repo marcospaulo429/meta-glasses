@@ -71,9 +71,17 @@ class MainActivity : AppCompatActivity() {
 
         requestPermissionsIfNeeded()
 
-        // HARNESS (debug): adb shell am start ... --ez auto_start true
+        // HARNESS (debug): adb shell am start ... --ez auto_start true [--ez video true]
         if (BuildConfig.DEBUG && intent.getBooleanExtra("auto_start", false)) {
             patientConsent.isChecked = true
+            if (intent.getBooleanExtra("video", false)) {
+                FeatureFlags.setSecurityVideoEnabled(this, true)
+                if (RecoveryKeyStore.publicKey(this) == null) {
+                    // PEM no filesDir para o teste de break-glass extrair via run-as
+                    File(filesDir, "custodian_demo.pem").writeText(RecoveryKeyStore.generateDemoPair(this))
+                }
+                videoConsent.isChecked = true
+            }
             startCapture()
         }
     }

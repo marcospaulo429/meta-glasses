@@ -76,8 +76,10 @@ class EncounterRepository(context: Context) {
                 .put("file", encryptedFile.name)
                 .put("sha256", crypto.sha256Plain)
                 .put("prevSha256", prevHash)
-                .put("wrappedDek", crypto.wrappedDek)
-                .put("wrapIv", crypto.wrapIv)
+                .put("wrapMode", crypto.wrapMode)
+                .putOpt("wrappedDek", crypto.wrappedDek)
+                .putOpt("wrapIv", crypto.wrapIv)
+                .putOpt("wrappedDekRecovery", crypto.wrappedDekRecovery)
                 .put("chunkIv", crypto.chunkIv)
                 .put("closedAt", System.currentTimeMillis()),
         )

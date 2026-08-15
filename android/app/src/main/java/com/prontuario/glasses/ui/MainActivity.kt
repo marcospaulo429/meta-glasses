@@ -17,6 +17,8 @@ import com.prontuario.glasses.capture.ConsultationCaptureService
 import com.prontuario.glasses.capture.ServiceBus
 import com.prontuario.glasses.config.FeatureFlags
 import com.prontuario.glasses.encounter.ConsentRecord
+import com.prontuario.glasses.vault.RecoveryKeyStore
+import java.io.File
 import kotlinx.coroutines.launch
 
 /**
@@ -104,6 +106,19 @@ class MainActivity : AppCompatActivity() {
             text = "Vídeo de segurança (consentimento específico)"
             visibility = if (FeatureFlags.securityVideoEnabled(context)) View.VISIBLE else View.GONE
         }
+        val custodianButton = Button(this).apply {
+            text = "Gerar chave do custodiante (demo)"
+            visibility = videoConsent.visibility
+            setOnClickListener {
+                // DEMO: em produção o par nasce fora do aparelho (SEC-01)
+                val pem = RecoveryKeyStore.generateDemoPair(context)
+                val out = File(getExternalFilesDir(null), "custodian_private_key.pem")
+                out.writeText(pem)
+                statusView.text =
+                    "Chave privada do custodiante exportada UMA vez para:\n${out.absolutePath}\n" +
+                    "Entregue ao custodiante e apague do aparelho. Vídeo agora grava em modo blindado."
+            }
+        }
         startButton = Button(this).apply { text = "Iniciar consulta" }
         stopButton = Button(this).apply {
             text = "Encerrar consulta"
@@ -125,6 +140,7 @@ class MainActivity : AppCompatActivity() {
             addView(companionPresent)
             addView(companionConsent)
             addView(videoConsent)
+            addView(custodianButton)
             addView(startButton)
             addView(stopButton)
             addView(statusView)

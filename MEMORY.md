@@ -42,13 +42,16 @@ Critérios do Segundo Filtro: Viabilidade técnica (30), Impacto (30), Aderênci
 - **Opt-out de telemetria do DAT**: `ANALYTICS_OPT_OUT=true` e `CRASH_REPORTING_OPT_OUT=true`.
 - **15/08 — time autorizou implementação.** Fase de código iniciada no branch `dev/marcos`, app em `android/` com flavors `sim` (sem DAT, compila sem token) e `dat` (DAT real, requer token — DAT-08).
 
-### 4.1 EM DISPUTA — gravação de segurança em vídeo contínuo (proposta 15/08, WhatsApp)
+### 4.1 Gravação de segurança em vídeo — resolvida como "MODO BLINDADO" (15/08, tarde)
 
-Proposta do time: vídeo contínuo em baixa qualidade como proteção médico-legal ("câmera de segurança"), criptografado, break-glass.
-- Parecer `lgpd-guardian`: **⛔ não implementar** — falha teste de necessidade (art. 6º, III) e agrava POL-01/AUP (ver POL-04 em docs/LIMITACOES.md).
-- Spec `arquiteto-android`: **viável condicionalmente** — 360×640@7fps, chunks de 60s, cofre AES-GCM/Keystore, escada de degradação L0–L4 com áudio clínico como invariante; "por turno" é irrealista, reposicionar como "por consulta".
-- **Meio-termo implementado**: módulo de vídeo atrás de feature flag `SECURITY_VIDEO_ENABLED=false` (padrão OFF). ⚠️ DECISÃO DO TIME PENDENTE antes da Entrega Final (22/08).
-- "Câmera como evento" permanece o comportamento padrão e o nível L2 da escada.
+Proposta original do time: vídeo contínuo em baixa qualidade como proteção médico-legal. Parecer `lgpd-guardian` foi ⛔ (necessidade, art. 6º III) e `arquiteto-android` deu viável condicional. **Marcos aprovou o meio-termo refinado**:
+- Vídeo fica no celular do médico, mas em **modo blindado**: DEK de cada chunk embrulhada SOMENTE com a chave pública do custodiante — **o aparelho é tecnicamente incapaz de decifrar** (nem o médico assiste).
+- Chave privada com custodiante institucional; abertura só mediante **ordem judicial** (gatilho judicial, custódia institucional — "oficial de justiça" não guarda chave).
+- Invariante no código: **sem chave pública do custodiante configurada, vídeo não grava**.
+- Eliminação pelo titular: crypto-erasure (apagar DEKs do manifesto), sem precisar decifrar.
+- Feature flag continua OFF por padrão; áudio+fotos+hash-chain seguem sendo a narrativa principal do pitch; vídeo é camada opcional.
+- ⚠️ Pendente: validar AUP ("locais sensíveis", POL-01/POL-04) com mentores Meta antes do pitch.
+- Implementado e testado em 15/08: `WrapPolicy.RecoveryOnly` + `RecoveryKeyStore` + testes JVM (transplante de chunk, decifra local recusada, break-glass com justificativa).
 
 ## 5. Fatos de hardware verificados (ficha técnica + repo DAT)
 

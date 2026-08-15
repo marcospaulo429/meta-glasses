@@ -24,7 +24,9 @@ import com.prontuario.glasses.encounter.ConsentRecord
 import com.prontuario.glasses.encounter.Encounter
 import com.prontuario.glasses.encounter.EncounterRepository
 import com.prontuario.glasses.ui.MainActivity
+import com.prontuario.glasses.vault.RecoveryKeyStore
 import com.prontuario.glasses.vault.SecurityVault
+import com.prontuario.glasses.vault.WrapPolicy
 import java.io.DataOutputStream
 import java.io.File
 import java.util.Locale
@@ -219,6 +221,12 @@ class ConsultationCaptureService : Service() {
     /** EM DISPUTA (MEMORY.md §4.1): só executa com flag ligada + consentimento específico. */
     private fun startSecurityVideo(gw: DeviceGateway) {
         val enc = encounter ?: return
+        // Modo blindado: sem chave pública do custodiante, vídeo NÃO grava (invariante SEC-01)
+        if (RecoveryKeyStore.publicKey(applicationContext) == null) {
+            Log.w(TAG, "Vídeo bloqueado: chave do custodiante não configurada")
+            ServiceBus.update { it.copy(lastEvent = "vídeo bloqueado: sem chave do custodiante") }
+            return
+        }
         videoJob = scope.launch {
             gw.startVideo(VideoConfig()).onFailure {
                 Log.w(TAG, "Vídeo de segurança indisponível: ${it.message}")
@@ -271,7 +279,19 @@ class ConsultationCaptureService : Service() {
         }
         val seq = videoSeq++
         val encrypted = File(enc.dir, "video_$seq.enc")
-        val crypto = SecurityVault.encryptFile(file, encrypted, repository.aadFor(enc.id, seq))
+        val custodianKey = RecoveryKeyStore.publicKey(applicationContext)
+        if (custodianKey == null) {
+            // Nunca gravar vídeo decifrável localmente: sem custodiante, descarta o chunk
+            Log.w(TAG, "Chunk de vídeo descartado: sem chave do custodiante")
+            file.delete()
+            return
+        }
+        val crypto = SecurityVault.encryptFile(
+            file,
+            encrypted,
+            repository.aadFor(enc.id, seq),
+            WrapPolicy.RecoveryOnly(custodianKey),
+        )
         file.delete()
         repository.addChunk(enc, ChunkKind.VIDEO, seq, encrypted, crypto)
         ServiceBus.update { it.copy(videoChunks = seq + 1) }

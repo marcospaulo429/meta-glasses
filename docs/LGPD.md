@@ -71,16 +71,20 @@
 
 "Tratamos dado sensível de saúde, então fizemos o caminho mais conservador: tudo roda no telefone, nada vai para a nuvem, telemetria do SDK desligada, o paciente consente antes, pode recusar e pode apagar. A IA não inventa: só organiza o que foi dito, com rastreabilidade de cada fato até o trecho do áudio, e o médico revisa e confirma antes de existir qualquer registro oficial. LGPD: base legal de tutela da saúde (art. 11, II, f) com consentimento destacado como salvaguarda."
 
-## 8. Gravação de segurança em vídeo contínuo (proposta 15/08) — EM DISPUTA
+## 8. Gravação de segurança em vídeo — MODO BLINDADO (adotado 15/08)
 
-**Status: feature flag desligada por padrão (`SECURITY_VIDEO_ENABLED=false`). Decisão do time pendente antes de 22/08.**
+**Status: implementado atrás de feature flag (`SECURITY_VIDEO_ENABLED=false` por padrão). Desenho refinado após o parecer ⛔ do guardião: a versão adotada responde às objeções com garantia técnica, não só política.**
 
-- **Parecer do guardião LGPD: ⛔** — vídeo contínuo do paciente falha o teste de **necessidade** (art. 6º, III): a finalidade de proteção médico-legal é atingível com meios menos invasivos já existentes (áudio integral consentido + fotos pontuais + log de auditoria hash-encadeado com hash de integridade dos artefatos). Também agrava frontalmente POL-01 (AUP da Meta: gravação em locais sensíveis).
-- **Se o time decidir prosseguir mesmo assim**, requisitos mínimos inegociáveis:
-  1. Base legal: exercício regular de direitos (art. 11, II, "d") **+ consentimento específico e destacado para o vídeo**, separado do consentimento do áudio clínico.
-  2. Consentimento também do **acompanhante**; aviso visível na porta do consultório (analogia CCTV) para terceiros incidentais; direito de eliminação garantido.
-  3. Vídeo nunca alimenta a IA, nunca sai do dispositivo, cifrado por chunk (AES-GCM, DEK por chunk, KEK no Keystore, envelope duplo com chave de recuperação institucional).
-  4. Break-glass: justificativa estruturada registrada **antes** da decifra + custodiante institucional (nunca o médico usuário) + biometria + log de auditoria append-only hash-encadeado.
-  5. Retenção máxima definida por prescrição de responsabilidade civil (referência: 3 anos CC art. 206 §3º V / 5 anos CDC art. 27 — validar com jurídico); destruição criptográfica no vencimento.
-  6. Validar com mentores Meta se a AUP comporta esse uso **antes** de apresentar no pitch.
-- **Alternativa recomendada pelo guardião** (proteção equivalente sem vídeo): manter áudio integral + fotos pontuais com **cadeia de custódia**: hash SHA-256 de cada artefato no log de auditoria assinado, provando integridade e não-adulteração — atende à finalidade médico-legal com minimização.
+Desenho: o vídeo fica no celular do médico, mas cada chunk é cifrado com DEK embrulhada **somente** na chave pública do custodiante institucional (`WrapPolicy.RecoveryOnly`). O aparelho é **tecnicamente incapaz** de decifrar — nem o médico assiste. A chave privada fica com o custodiante (direção clínica/DPO/escrow), que só a usa mediante **ordem judicial**. Sem chave pública configurada, o vídeo simplesmente não grava (invariante no código).
+
+Salvaguardas obrigatórias:
+1. Base legal: exercício regular de direitos (art. 11, II, "d") + **consentimento específico e destacado para o vídeo**, separado do áudio clínico.
+2. Consentimento também do **acompanhante**; aviso visível na porta (analogia CCTV) para terceiros incidentais.
+3. Vídeo nunca alimenta a IA, nunca sai do dispositivo; AAD por chunk impede transplante entre consultas.
+4. Break-glass: justificativa estruturada registrada **antes** da decifra + log de auditoria hash-encadeado; decifra sem justificativa é recusada pelo código.
+5. Eliminação (art. 18): **crypto-erasure** — apagar as DEKs embrulhadas do manifesto torna o vídeo irrecuperável sem precisar decifrá-lo.
+6. Retenção máxima por prescrição de responsabilidade civil (3 anos CC art. 206 §3º V / 5 anos CDC art. 27 — validar com jurídico); destruição criptográfica no vencimento.
+7. Risco residual SEC-01: perda da chave privada = vídeo irrecuperável — custódia com backup redundante (processo institucional, não código).
+8. ⚠️ AUP da Meta (POL-01): criptografar não muda a *captura* em local sensível — validar com mentores Meta **antes** do pitch.
+
+Narrativa de pitch: liderar com áudio+fotos+cadeia de custódia (hash SHA-256 no log assinado); apresentar o vídeo blindado como camada **opcional** de proteção médico-legal — "nem o médico consegue assistir; só ordem judicial abre".

@@ -94,6 +94,12 @@ SOAP: extração factual → classificador heurístico (zero alucinação por co
 Segurança: modo blindado do vídeo (RecoveryOnly) · crypto-erasure por tipo · gaps documentados · auditoria hash-encadeada · telemetria de bateria do telefone.
 UI: consentimento bloqueante · status ao vivo · revisão com confirmar/descartar/erase/verificar auditoria.
 
+### 7.1.1 Atestado automático (17/08 — implementado e testado no emulador)
+
+Fluxo: médico fala "emitir atestado de N dias" → comando de voz confirma por TTS → `AtestadoExtractor` extrai dias/CID **somente se enunciados** (nunca infere — CFM 1.658/2002) → rascunho cifrado com proveniência → revisão → confirmação gera PDF (PdfDocument) com hash no audit. CID exige consentimento específico do paciente (switch separado). Assinatura ICP-Brasil = fase 2; PDF exige assinatura física.
+Teste real: ASR errou "emitir"→"admitir" e o prefixo tolerante segurou; "cid R 51" foi destruído pelo ASR e o sistema corretamente NÃO inventou CID. PDF válido com paciente/médico/CRM/3 dias.
+Receita médica NÃO entra no MVP (regulação de prescrição eletrônica é mais pesada) — citar só como roadmap.
+
 ### 7.2 Teste fim-a-fim no EMULADOR (15/08 — pipeline inteiro validado)
 
 Setup reproduzível: AVD `prontuario_test` (Pixel 7, API 35 arm64) · áudio de consulta gerado com `say -v Luciana` (44s, WAV 16 kHz) · modelo vosk-small-pt via `run-as` em `filesDir/models/vosk-pt` · harness `WavReplayAudioSource` + `--ez auto_start true`.

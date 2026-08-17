@@ -77,6 +77,13 @@ class MainActivity : AppCompatActivity() {
 
         requestPermissionsIfNeeded()
 
+        // HARNESS (debug): abre a revisão com auto-confirmação do atestado
+        if (BuildConfig.DEBUG && intent.getBooleanExtra("review_confirm_atestado", false)) {
+            startActivity(
+                Intent(this, ReviewActivity::class.java).putExtra("auto_confirm_atestado", true),
+            )
+        }
+
         // HARNESS (debug): adb shell am start ... --ez auto_start true [--ez video true]
         if (BuildConfig.DEBUG && intent.getBooleanExtra("auto_start", false)) {
             patientConsent.isChecked = true

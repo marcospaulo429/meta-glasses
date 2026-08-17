@@ -45,8 +45,11 @@ O harness (só em build debug) troca o microfone pelo WAV quando `files/test_inp
 ```bash
 adb shell am start -n com.prontuario.glasses.sim/com.prontuario.glasses.ui.MainActivity --ez auto_start true              # só áudio
 adb shell am start ... --ez auto_start true --ez video true    # + vídeo blindado (gera chave do custodiante demo)
-adb logcat -s CaptureService   # acompanhar; rascunho SOAP sai como "HARNESS draft"
+adb shell am start ... --ez review_confirm_atestado true       # confirma atestado pendente e gera o PDF
+adb logcat -s CaptureService   # acompanhar; rascunhos saem como "HARNESS draft" / "HARNESS atestado"
 ```
+
+Para testar o atestado, inclua no roteiro do `say`: "Vou emitir atestado de três dias por motivo de doença". O PDF sai em `files/encounters/<id>/atestado.pdf` (extrair com `run-as cat`).
 
 Flags de teste (via prefs): `sim_thermal_after_s` injeta THERMAL_CRITICAL após N s de vídeo (testa a escada L0→L2).
 

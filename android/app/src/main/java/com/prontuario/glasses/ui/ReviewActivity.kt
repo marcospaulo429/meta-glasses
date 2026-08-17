@@ -6,12 +6,17 @@ import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.prontuario.glasses.BuildConfig
+import com.prontuario.glasses.atestado.AtestadoJson
+import com.prontuario.glasses.atestado.AtestadoPdf
 import com.prontuario.glasses.encounter.ChunkKind
 import com.prontuario.glasses.encounter.Encounter
 import com.prontuario.glasses.encounter.EncounterRepository
 import com.prontuario.glasses.soap.FactStatus
 import com.prontuario.glasses.soap.SoapJson
 import com.prontuario.glasses.soap.SoapNote
+import com.prontuario.glasses.vault.SecurityVault
+import java.io.File
 import org.json.JSONObject
 
 /**
@@ -73,6 +78,10 @@ class ReviewActivity : AppCompatActivity() {
                 content.append(if (ok) "\n✅ Cadeia de auditoria íntegra." else "\n⛔ CADEIA VIOLADA!")
             }
         }
+        val atestadoButton = Button(this).apply {
+            text = "Confirmar atestado e gerar PDF"
+            setOnClickListener { confirmAtestado() }
+        }
 
         val density = resources.displayMetrics.density
         val pad = (16 * density).toInt()
@@ -84,6 +93,7 @@ class ReviewActivity : AppCompatActivity() {
                         setPadding(pad, pad, pad, pad)
                         addView(TextView(context).apply { text = "Revisão do rascunho"; textSize = 20f })
                         addView(confirmButton)
+                        addView(atestadoButton)
                         addView(eraseVideoButton)
                         addView(discardButton)
                         addView(auditButton)
@@ -93,6 +103,34 @@ class ReviewActivity : AppCompatActivity() {
             },
         )
         render()
+
+        // HARNESS (debug): adb shell am start ... --ez auto_confirm_atestado true
+        if (BuildConfig.DEBUG && intent.getBooleanExtra("auto_confirm_atestado", false)) {
+            confirmAtestado()
+        }
+    }
+
+    /** Ato do médico: confirma o rascunho do atestado e materializa o PDF (auditado). */
+    private fun confirmAtestado() {
+        val enc = encounter ?: return
+        val bytes = repository.readDocument(enc, "atestado_draft")
+        if (bytes == null) {
+            content.append("\n(sem rascunho de atestado nesta consulta)")
+            return
+        }
+        val draft = AtestadoJson.fromJson(JSONObject(String(bytes))).copy(confirmed = true)
+        repository.saveDocument(enc, "atestado_draft", AtestadoJson.toJson(draft).toString(2).toByteArray())
+        val pdf = File(enc.dir, "atestado.pdf")
+        AtestadoPdf.write(draft, pdf)
+        repository.auditLog.append(
+            "atestado_emitido",
+            JSONObject()
+                .put("encounterId", enc.id)
+                .putOpt("days", draft.days)
+                .put("cidIncluido", draft.cid != null)
+                .put("pdfSha256", SecurityVault.sha256(pdf)),
+        )
+        content.append("\n📄 Atestado confirmado — PDF em ${pdf.absolutePath}")
     }
 
     private fun render() {
@@ -120,6 +158,15 @@ class ReviewActivity : AppCompatActivity() {
             }
             gaps.filterValues { it.isNotEmpty() }.forEach { (kind, missing) ->
                 appendLine("⚠️ Gaps de ${kind.name}: sequências $missing (documentado no manifesto)")
+            }
+            repository.readDocument(enc, "atestado_draft")?.let { bytes ->
+                val atestado = AtestadoJson.fromJson(JSONObject(String(bytes)))
+                appendLine()
+                appendLine("📋 ATESTADO (rascunho — pendente de confirmação)")
+                appendLine("  Paciente: ${atestado.patientName ?: "não informado"}")
+                appendLine("  Dias: ${atestado.days?.toString() ?: "❗ não informado — preencher"}")
+                appendLine("  CID: ${atestado.cid ?: "não incluso"}")
+                atestado.provenance?.let { appendLine("  Origem: [${it.startMs / 1000}s–${it.endMs / 1000}s] “${atestado.spokenText.take(60)}…”") }
             }
             appendLine()
             appendSection("S — Subjetivo", note, SoapNote::subjective)

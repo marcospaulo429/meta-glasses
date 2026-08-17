@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
@@ -17,6 +18,7 @@ import com.google.android.material.switchmaterial.SwitchMaterial
 import com.prontuario.glasses.BuildConfig
 import com.prontuario.glasses.capture.ConsultationCaptureService
 import com.prontuario.glasses.capture.ServiceBus
+import com.prontuario.glasses.config.DoctorProfile
 import com.prontuario.glasses.config.FeatureFlags
 import com.prontuario.glasses.encounter.ConsentRecord
 import com.prontuario.glasses.vault.RecoveryKeyStore
@@ -34,6 +36,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var companionPresent: SwitchMaterial
     private lateinit var companionConsent: SwitchMaterial
     private lateinit var videoConsent: SwitchMaterial
+    private lateinit var cidConsent: SwitchMaterial
+    private lateinit var patientNameField: EditText
+    private lateinit var doctorNameField: EditText
+    private lateinit var doctorCrmField: EditText
     private lateinit var startButton: Button
     private lateinit var stopButton: Button
 
@@ -74,6 +80,12 @@ class MainActivity : AppCompatActivity() {
         // HARNESS (debug): adb shell am start ... --ez auto_start true [--ez video true]
         if (BuildConfig.DEBUG && intent.getBooleanExtra("auto_start", false)) {
             patientConsent.isChecked = true
+            cidConsent.isChecked = true
+            patientNameField.setText("Paciente Demo")
+            if (DoctorProfile.name(this).isNullOrBlank()) {
+                doctorNameField.setText("Dra. Ana Souza")
+                doctorCrmField.setText("CRM-GO 12345")
+            }
             if (intent.getBooleanExtra("video", false)) {
                 FeatureFlags.setSecurityVideoEnabled(this, true)
                 if (RecoveryKeyStore.publicKey(this) == null) {
@@ -91,13 +103,15 @@ class MainActivity : AppCompatActivity() {
             statusView.text = "⚠️ Sem consentimento do paciente a captura não inicia (docs/LGPD.md §3)."
             return
         }
+        DoctorProfile.save(this, doctorNameField.text.toString().trim(), doctorCrmField.text.toString().trim())
         val consent = ConsentRecord(
             patientConsented = patientConsent.isChecked,
             companionPresent = companionPresent.isChecked,
             companionConsented = companionConsent.isChecked,
             securityVideoConsented = videoConsent.isChecked,
+            cidConsented = cidConsent.isChecked,
         )
-        ConsultationCaptureService.start(this, consent)
+        ConsultationCaptureService.start(this, consent, patientNameField.text.toString().trim())
     }
 
     private fun hasAudioPermission(): Boolean =
@@ -122,6 +136,16 @@ class MainActivity : AppCompatActivity() {
         patientConsent = SwitchMaterial(this).apply { text = "Paciente informado e consentiu" }
         companionPresent = SwitchMaterial(this).apply { text = "Acompanhante presente" }
         companionConsent = SwitchMaterial(this).apply { text = "Acompanhante consentiu" }
+        cidConsent = SwitchMaterial(this).apply { text = "Paciente autoriza CID no atestado" }
+        patientNameField = EditText(this).apply { hint = "Nome do paciente (para atestado)" }
+        doctorNameField = EditText(this).apply {
+            hint = "Nome do médico"
+            setText(DoctorProfile.name(context) ?: "")
+        }
+        doctorCrmField = EditText(this).apply {
+            hint = "CRM"
+            setText(DoctorProfile.crm(context) ?: "")
+        }
         videoConsent = SwitchMaterial(this).apply {
             text = "Vídeo de segurança (consentimento específico)"
             visibility = if (FeatureFlags.securityVideoEnabled(context)) View.VISIBLE else View.GONE
@@ -163,6 +187,10 @@ class MainActivity : AppCompatActivity() {
             addView(patientConsent)
             addView(companionPresent)
             addView(companionConsent)
+            addView(cidConsent)
+            addView(patientNameField)
+            addView(doctorNameField)
+            addView(doctorCrmField)
             addView(videoConsent)
             addView(custodianButton)
             addView(startButton)

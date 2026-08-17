@@ -15,6 +15,8 @@ class ConsentRecord(
     val companionPresent: Boolean,
     val companionConsented: Boolean,
     val securityVideoConsented: Boolean,
+    /** CFM 1.658/2002: CID no atestado exige autorização expressa do paciente. */
+    val cidConsented: Boolean = false,
 )
 
 class Encounter(val id: String, val dir: File)
@@ -53,7 +55,8 @@ class EncounterRepository(
                     .put("patient", consent.patientConsented)
                     .put("companionPresent", consent.companionPresent)
                     .put("companion", consent.companionConsented)
-                    .put("securityVideo", consent.securityVideoConsented),
+                    .put("securityVideo", consent.securityVideoConsented)
+                    .put("cidInAtestado", consent.cidConsented),
             )
             .put("chunks", JSONArray())
             .put("documents", JSONArray())

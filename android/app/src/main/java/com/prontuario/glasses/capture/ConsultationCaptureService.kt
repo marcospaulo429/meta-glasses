@@ -19,9 +19,12 @@ import com.prontuario.glasses.R
 import com.prontuario.glasses.asr.StreamingTranscriber
 import com.prontuario.glasses.asr.VoiceCommandDetector
 import com.prontuario.glasses.asr.VoskSpeechPort
+import com.prontuario.glasses.atestado.AtestadoExtractor
+import com.prontuario.glasses.atestado.AtestadoJson
 import com.prontuario.glasses.audio.AudioRouteManager
 import com.prontuario.glasses.audio.ConsultationAudioRecorder
 import com.prontuario.glasses.audio.WavReplayAudioSource
+import com.prontuario.glasses.config.DoctorProfile
 import com.prontuario.glasses.config.FeatureFlags
 import com.prontuario.glasses.device.DeviceGateway
 import com.prontuario.glasses.device.GatewayFactory
@@ -70,14 +73,18 @@ class ConsultationCaptureService : Service() {
         const val EXTRA_COMPANION_PRESENT = "companion_present"
         const val EXTRA_COMPANION_CONSENT = "companion_consent"
         const val EXTRA_VIDEO_CONSENT = "video_consent"
+        const val EXTRA_CID_CONSENT = "cid_consent"
+        const val EXTRA_PATIENT_NAME = "patient_name"
 
-        fun start(context: Context, consent: ConsentRecord) {
+        fun start(context: Context, consent: ConsentRecord, patientName: String?) {
             val intent = Intent(context, ConsultationCaptureService::class.java).apply {
                 action = ACTION_START
                 putExtra(EXTRA_PATIENT_CONSENT, consent.patientConsented)
                 putExtra(EXTRA_COMPANION_PRESENT, consent.companionPresent)
                 putExtra(EXTRA_COMPANION_CONSENT, consent.companionConsented)
                 putExtra(EXTRA_VIDEO_CONSENT, consent.securityVideoConsented)
+                putExtra(EXTRA_CID_CONSENT, consent.cidConsented)
+                putExtra(EXTRA_PATIENT_NAME, patientName)
             }
             context.startForegroundService(intent)
         }
@@ -112,6 +119,8 @@ class ConsultationCaptureService : Service() {
     private var transcriber: StreamingTranscriber? = null
     private val segments = mutableListOf<TranscriptSegment>()
     private var replaySource: WavReplayAudioSource? = null
+    private var patientName: String? = null
+    private var cidConsented = false
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -160,7 +169,10 @@ class ConsultationCaptureService : Service() {
             companionPresent = intent.getBooleanExtra(EXTRA_COMPANION_PRESENT, false),
             companionConsented = intent.getBooleanExtra(EXTRA_COMPANION_CONSENT, false),
             securityVideoConsented = intent.getBooleanExtra(EXTRA_VIDEO_CONSENT, false),
+            cidConsented = intent.getBooleanExtra(EXTRA_CID_CONSENT, false),
         )
+        patientName = intent.getStringExtra(EXTRA_PATIENT_NAME)?.ifBlank { null }
+        cidConsented = consent.cidConsented
         val created = try {
             repository.create(consent)
         } catch (e: IllegalArgumentException) {
@@ -180,6 +192,7 @@ class ConsultationCaptureService : Service() {
         val commandDetector = VoiceCommandDetector(
             onPhotoCommand = { capturePhotoByVoice() },
             onStopCommand = { stop(applicationContext) },
+            onAtestadoCommand = { speak("Atestado anotado.") },
         )
         // Interno primeiro (run-as/instalação pelo app); externo como conveniência de adb push
         val modelDir = listOf(
@@ -462,12 +475,33 @@ class ConsultationCaptureService : Service() {
         repository.saveDocument(
             enc, "soap_draft", SoapJson.noteToJson(note, validation).toString(2).toByteArray(),
         )
+
+        // Atestado: rascunho só se pedido na fala; CID descartado sem consentimento específico
+        val atestado = AtestadoExtractor.extract(enc.id, snapshot)?.let { draft ->
+            draft.copy(
+                cid = if (cidConsented) draft.cid else null,
+                patientName = patientName,
+                doctorName = DoctorProfile.name(applicationContext),
+                doctorCrm = DoctorProfile.crm(applicationContext),
+            )
+        }
+        atestado?.let {
+            repository.saveDocument(enc, "atestado_draft", AtestadoJson.toJson(it).toString(2).toByteArray())
+            if (BuildConfig.DEBUG) Log.i(TAG, "HARNESS atestado: " + AtestadoJson.toJson(it).toString(2))
+        }
         ServiceBus.update { it.copy(draftReady = true) }
 
         val uncertain = facts.count { it.status.name == "UNCERTAIN" }
         speak(
-            "Consulta encerrada. Rascunho pronto com ${facts.size} fatos" +
-                if (uncertain > 0) ", $uncertain para revisar." else ".",
+            buildString {
+                append("Consulta encerrada. Rascunho pronto com ${facts.size} fatos")
+                append(if (uncertain > 0) ", $uncertain para revisar." else ".")
+                atestado?.let {
+                    append(" Atestado de ${it.days?.toString() ?: "dias não informados"} ")
+                    append(if (it.days != null) "dias " else "")
+                    append("aguardando revisão.")
+                }
+            },
         )
     }
 

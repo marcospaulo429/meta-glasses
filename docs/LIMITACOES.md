@@ -18,7 +18,7 @@
 
 | ID | Limitação | Impacto no projeto | Mitigação | Status |
 |---|---|---|---|---|
-| DAT-01 | **Microfone NÃO é API pública do DAT** | Não existe "mic dos óculos" via SDK | Áudio via Bluetooth HFP/SCO do Android: `MODE_IN_COMMUNICATION` + `setCommunicationDevice(TYPE_BLUETOOTH_SCO)`; DAT cuida só de câmera/sessão | 🟡 |
+| DAT-01 | **Microfone NÃO é API pública do DAT** — docs da Meta (citadas em #136): sessões DAT "share microphone and speaker access with the system Bluetooth stack"; há guia oficial de ordering (HFP configurado e estabilizado ANTES do stream) | Não existe "mic dos óculos" via SDK; o caminho é o BT do sistema | Áudio via HFP/SCO: `MODE_IN_COMMUNICATION` + `setCommunicationDevice(TYPE_BLUETOOTH_SCO)`; rota estabilizada antes do stream (implementado nessa ordem) | 🟢 (caminho oficial confirmado 19/08) |
 | DAT-02 | **Stream de câmera máx. 720×1280 @ 30 fps** (nativo é 12 MP/3K) | Qualidade de imagem clínica limitada | Preferir `capturePhoto()`; testar enquadramento a 0,5/1/1,5 m; aceitar limite para lesões focalizadas | 🟡 |
 | DAT-03 | **FOV do stream ~53° horizontal vs ~88° nativo** (issue pública) | Enquadramento mais difícil do que o esperado | Treinar posicionamento do médico; feedback por áudio ("aproxime-se"); testes de enquadramento no protótipo | 🟡 |
 | DAT-04 | **Coexistência HFP/SCO + câmera instável em alguns telefones** (discussão #136: `CRITICAL_STREAM_ERROR`, GATT/heartbeat timeout) | Risco de queda de stream/áudio durante consulta | Ordem de inicialização: HFP estável primeiro, câmera depois; reconexão controlada; testar 15–20 min no aparelho real do hackathon; ter ≥2 aparelhos se possível | 🔴 |
@@ -29,6 +29,7 @@
 | DAT-09 | Telemetria/crash reporting do SDK habilitados por padrão | Risco de vazamento de metadados em contexto clínico | `ANALYTICS_OPT_OUT=true` + `CRASH_REPORTING_OPT_OUT=true` no manifest | 🟡 |
 | DAT-10 | **Formato do `videoStream` não confirmado** (frames decodificados vs bitstream HEVC com `compressVideo=true`) — define se há re-encode no telefone | Custo de CPU/bateria no telefone e arquitetura do gravador de chunks | Sample usa passthrough HEVC (`isCompressed=true`); verificar no MockDeviceKit; re-encode MediaCodec HW como caso base | 🔴 |
 | DAT-11 | **Estabilidade de streaming multi-hora nunca demonstrada** (#136 validou ~5,5 min); reconexão em sessão longa não documentada | Gravação de segurança pode ter buracos ou derrubar SCO | Chunks de 60s com fechamento atômico + manifesto que documenta gaps; 1º sinal de instabilidade → encerrar vídeo preservando áudio; teste 30+ min no hackathon | 🔴 |
+| DAT-12 | **`capturePhoto()` só funciona durante um stream ativo** (#136: "capture a single frame during a stream"; skill oficial confirma o fluxo addCamera→stream.start→capturePhoto) | "Foto sem stream" não existe; foto pontual = burst breve de stream | Gateway implementa burst: addCamera → start → capturePhoto → stop; latência do burst a medir no hackathon | 🟡 (verificado em fonte 19/08) |
 
 ## 3. Android
 
@@ -36,7 +37,7 @@
 |---|---|---|---|---|
 | AND-01 | **FGS de microfone não pode iniciar de background** (Android 14+; permissão while-in-use) | Captura precisa começar com a Activity visível | Fluxo: UI visível → consentimento → `startForegroundService()` → usuário pode sair da tela | 🟡 |
 | AND-02 | **OEM battery savers matam serviços** (Xiaomi/Samsung etc.) | Captura pode morrer em background | Foreground Service tipo `microphone` + notificação persistente; testar doze/tela bloqueada/otimização de bateria no aparelho do hackathon | 🔴 |
-| AND-03 | **Áudio HFP/SCO é banda estreita (~8–16 kHz)** | Qualidade do ASR degradada vs mic do celular | **Evidência medida (15/08, emulador, áudio reamostrado a 8 kHz): degradação severa — "doutor"→"dor", "muito forte"→"mito e", "náusea" desaparece.** Mitigações: testar HFP real com fone BT em celular físico; modelo maior; se inaceitável → fallback mic do celular (L4) | 🟡 (medido em simulação; falta HFP real) |
+| AND-03 | **Áudio HFP/SCO é banda estreita** — #136 corrige: Ray-Ban Meta negocia **mSBC wideband 16 kHz** (não 8 kHz CVSD) | Qualidade do ASR degradada vs mic do celular, mas menos que o pior caso | **Evidência medida (15/08, emulador, 8 kHz = pior caso): degradação severa.** Real é 16 kHz mSBC — melhor que o simulado; validar no hardware; fallback mic do celular (L4) | 🟡 (pior caso medido; real é melhor) |
 | AND-04 | `startBluetoothSco()` deprecado (API 31+) | Rota de áudio frágil se usar API antiga | Usar `setCommunicationDevice()`; aguardar rota estabilizar antes de gravar | 🟡 |
 | AND-05 | Perfil BT pode alternar (HFP×A2DP) ao entrar em comunicação | TTS pode sair no canal errado / cortar | Manter `MODE_IN_COMMUNICATION` durante a consulta inteira; não abrir/fechar HFP por comando | 🟡 |
 | AND-06 | **Encode HEVC + cifra contínuos no telefone** somam-se a ASR/LLM on-device: bateria/térmico do telefone desconhecido (PRG-03) | Telefone pode virar o gargalo antes dos óculos | Encoder de hardware; 360p/7fps baseline; medir consumo do telefone separado no benchmark | 🔴 |

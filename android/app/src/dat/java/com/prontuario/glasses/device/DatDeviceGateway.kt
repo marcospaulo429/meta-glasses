@@ -172,10 +172,19 @@ class DatDeviceGateway(private val context: Context) : DeviceGateway {
         _isVideoActive.value = false
     }
 
+    /**
+     * DAT-12: capturePhoto só funciona com stream ativo. Sem câmera anexada, executa um
+     * burst: addCamera → stream.start → capturePhoto → stop (a "foto sem stream" não existe).
+     */
     override suspend fun capturePhoto(): Result<Bitmap> {
+        val burst = camera == null
+        if (burst) {
+            startVideo(VideoConfig(quality = VideoQualityProfile.HIGH, frameRate = 2))
+                .onFailure { return Result.failure(it) }
+        }
         val stream = camera?.stream
-            ?: return Result.failure(IllegalStateException("Câmera não anexada — foto pontual exige addCamera antes"))
-        return suspendCancellableCoroutine { continuation ->
+            ?: return Result.failure(IllegalStateException("Stream indisponível para captura"))
+        val result: Result<Bitmap> = suspendCancellableCoroutine { continuation ->
             scope.launch {
                 stream.capturePhoto()
                     .onSuccess { photoData ->
@@ -193,6 +202,8 @@ class DatDeviceGateway(private val context: Context) : DeviceGateway {
                     }
             }
         }
+        if (burst) stopVideo()
+        return result
     }
 
     private fun VideoQualityProfile.toDatQuality(): VideoQuality = when (this) {

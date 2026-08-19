@@ -1,0 +1,54 @@
+flowchart TB
+    subgraph GLASSES["Ray-Ban Meta Wayfarer Gen 2"]
+        MIC["Microfone<br/>(array de 5 mics)"]
+        CAM["Camera 12MP"]
+        SPK["Alto-falantes"]
+    end
+
+    HFP["Bluetooth HFP/SCO"]
+    DAT["SDK DAT 0.9<br/>DeviceSession.addCamera"]
+
+    subgraph PHONE["Smartphone Android — 100% on-device, zero nuvem"]
+        subgraph FGS["Foreground Service (microphone + connectedDevice)"]
+            ROUTE["Rota de audio<br/>MODE_IN_COMMUNICATION<br/>setCommunicationDevice(SCO)"]
+            REC["AudioRecord persistente<br/>16 kHz PCM"]
+            ASR["ASR streaming Vosk PT-BR<br/>timestamps por palavra"]
+            CMD["Comandos de voz:<br/>registrar imagem · emitir atestado · encerrar"]
+            LADDER["Escada de energia L0–L4<br/>gatilhos: thermal, bateria,<br/>erros de stream"]
+        end
+
+        subgraph CLINICAL["Pipeline clinico (ao encerrar)"]
+            FACTS["Extracao factual<br/>proveniencia obrigatoria"]
+            SOAP["Classificacao SOAP<br/>(A nunca inferida)"]
+            VALID["Validador de proveniencia<br/>unsupported-statement-rate"]
+            ATEST["Extractor de atestado<br/>dias/CID so se enunciados<br/>(CFM 1.658/2002)"]
+        end
+
+        subgraph VAULT["Cofre local cifrado"]
+            ENC["Chunks 60s AES-GCM<br/>DEK por chunk + KEK no Keystore<br/>AAD amarra chunk a consulta"]
+            BLIND["Modo blindado (video opcional)<br/>DEK so na chave publica do custodiante<br/>abre apenas com ordem judicial"]
+            AUDIT["Auditoria hash-encadeada<br/>cadeia de custodia sha256"]
+        end
+
+        REVIEW["Revisao do medico<br/>confirmar · editar · descartar · crypto-erasure"]
+        PDF["Atestado PDF<br/>hash auditado, apos confirmacao"]
+    end
+
+    EHR["Sistema de prontuario oficial<br/>(exportacao FHIR — fase 2)"]
+
+    MIC --> HFP --> ROUTE --> REC
+    REC --> ASR --> CMD
+    REC --> ENC
+    CAM --> DAT
+    CMD -- "registrar imagem" --> DAT
+    DAT -- "capturePhoto (foto pontual)" --> ENC
+    DAT -. "video LOW 360p@7fps<br/>(flag OFF por padrao)" .-> BLIND
+    LADDER -. "degrada video/camera<br/>preserva audio clinico" .-> DAT
+    ASR --> FACTS --> SOAP --> VALID --> REVIEW
+    ASR --> ATEST --> REVIEW
+    VALID -- "transcript + soap_draft cifrados" --> ENC
+    ENC --> AUDIT
+    BLIND --> AUDIT
+    CMD -- "TTS: confirmacoes,<br/>avisos e resumo final" --> SPK
+    REVIEW --> PDF
+    REVIEW -- "somente apos confirmacao" --> EHR

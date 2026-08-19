@@ -6,15 +6,18 @@ Consulta médica capturada pelos Ray-Ban Meta Wayfarer Gen 2, processada 100% on
 
 ## Mapa do repositório
 
-| Arquivo | Conteúdo |
+| Caminho | Conteúdo |
 |---|---|
+| [docs/entrega/](docs/entrega/) | **Entrega Final**: documento estruturado (MD/PDF) + diagrama de arquitetura (Mermaid/PNG/SVG) |
 | [MEMORY.md](MEMORY.md) | Fonte de verdade: decisões, fatos verificados, datas, pendências |
 | [docs/PLANO.md](docs/PLANO.md) | Plano mestre até o hackathon (18/09) |
-| [docs/LIMITACOES.md](docs/LIMITACOES.md) | Limitações encontradas × mitigações (documento vivo) |
+| [docs/LIMITACOES.md](docs/LIMITACOES.md) | Limitações encontradas × mitigações, com fonte e status (documento vivo) |
 | [docs/LGPD.md](docs/LGPD.md) | Conformidade LGPD / privacidade / checkpoint do edital |
 | [docs/PESQUISA.md](docs/PESQUISA.md) | Resumo verificado das fontes (AUP, Muse Glimmer, repo DAT) |
+| [android/](android/) | App companion (Kotlin). Flavors: `sim` (roda sem óculos/token) e `dat` (DAT 0.9.0 real) |
+| [android/TESTING.md](android/TESTING.md) | Guia de testes em 3 níveis: emulador · celular físico · óculos no hackathon |
+| [scripts/](scripts/) | Utilitários (instalação do modelo ASR no aparelho) |
 | [.github/agents/](.github/agents/) | Subagentes: orquestrador, pesquisador, arquiteto-android, lgpd-guardian, redator-entrega |
-| `android/` | App companion (Kotlin). Flavors: `sim` (roda sem óculos/token) e `dat` (DAT 0.9.0 real) |
 | `vendor/meta-wearables-dat-android/` | Clone do repo oficial DAT (referência local; não versionado) |
 | `docs/*.pdf` | Edital e arquitetura v2 |
 
@@ -34,4 +37,6 @@ Flavor `dat` (integração real) exige: `github_token` (escopo `read:packages`) 
 
 ## Estado atual
 
-**MVP `sim` funcional (15/08)**: consulta fim-a-fim sem óculos — áudio cifrado por chunks, ASR PT-BR (Vosk) com comandos de voz, rascunho SOAP com validação anti-alucinação, vídeo blindado opcional (indecifrável no aparelho; só custodiante com ordem judicial), crypto-erasure, auditoria hash-encadeada e tela de revisão. Modelo ASR: `scripts/install-vosk-model.sh`. Flavor `dat` aguarda token/credenciais (AND-07). Próximos marcos: Entrega Final da Ideia (**22/08**), Hackathon (**18/09**, Meta SP).
+**MVP `sim` funcional e testado fim-a-fim em emulador** (52 testes automatizados): consulta por voz → transcrição PT-BR on-device → rascunho SOAP com validação anti-alucinação → foto e atestado (PDF) por comando de voz → revisão do médico — tudo cifrado, auditado e sem permissão de INTERNET no manifest. Vídeo blindado opcional (indecifrável no aparelho; só custodiante com ordem judicial). Flavor `dat` aguarda credenciais (AND-07). Próximos marcos: Entrega Final (**22/08**), Hackathon (**18/09**, Meta SP).
+
+Convenções: commits em inglês (conventional commits); branch de trabalho: `main`.

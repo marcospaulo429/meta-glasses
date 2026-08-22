@@ -2,6 +2,8 @@
 
 **Programa AI Glasses Brasil 2026 · Trilha Bem-Estar · 22/08/2026**
 
+**Repositório oficial:** <https://github.com/marcospaulo429/meta-glasses>
+
 > O médico atende usando Ray-Ban Meta e sem tocar em telas. O áudio da consulta é processado localmente no Android para gerar um rascunho SOAP rastreável; fotos clínicas e atestados podem ser solicitados por voz. O médico revisa e confirma tudo. O pipeline não envia intencionalmente conteúdo clínico a serviços de IA em nuvem.
 
 ---

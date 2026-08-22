@@ -1,0 +1,12 @@
+{
+  "name": "apresentacao-assistente-prontuario-automatico",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Gerador da apresentação do Assistente de Prontuário Automático para o AI Glasses Brasil 2026.",
+  "scripts": {
+    "gerar": "node generate_slides.js"
+  },
+  "devDependencies": {
+    "pptxgenjs": "3.12.0"
+  }
+}

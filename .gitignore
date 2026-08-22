@@ -10,6 +10,10 @@ vendor/
 .DS_Store
 Slides-*.zip
 
+# Local agent context (not part of the public project)
+MEMORY.md
+.github/agents/
+
 # Android
 android/.gradle/
 android/build/
@@ -22,6 +26,7 @@ android/.kotlin/
 
 # Distribution / packaging
 .Python
+node_modules/
 build/
 develop-eggs/
 dist/

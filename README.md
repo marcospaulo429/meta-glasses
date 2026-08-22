@@ -1,15 +1,31 @@
-# meta-glasses
+# Assistente de Prontuário Automático
 
-Planejamento do **Assistente de Prontuário Automático** — Programa AI Glasses Brasil 2026 (CEIA/UFG/FUNAPE/Meta).
+Projeto da trilha **Bem-Estar** do Programa AI Glasses Brasil 2026 (CEIA/UFG/FUNAPE/Meta).
 
-Consulta médica capturada pelos Ray-Ban Meta Wayfarer Gen 2, processada 100% on-device no Android (ASR → extração factual → SOAP), com revisão humana obrigatória. Sem display: interação por voz; saída por áudio.
+O médico conduz a consulta com Ray-Ban Meta, sem tocar em telas. O Android processa o áudio localmente, extrai fatos com proveniência e prepara um rascunho SOAP. Fotos clínicas e atestados podem ser solicitados por voz. Nada se torna registro oficial sem revisão humana.
+
+## Entrega da competição
+
+| Artefato | Formato editável | Formato para envio |
+|---|---|---|
+| Documento oficial | [ENTREGA_FINAL.md](docs/entrega/ENTREGA_FINAL.md) | [ENTREGA_FINAL.pdf](docs/entrega/ENTREGA_FINAL.pdf) |
+| Arquitetura | [arquitetura.mmd](docs/entrega/arquitetura.mmd) | [arquitetura.png](docs/entrega/arquitetura.png) |
+| Apresentação | [PITCH_AI_GLASSES_BRASIL.pptx](docs/entrega/pitch/PITCH_AI_GLASSES_BRASIL.pptx) | [PITCH_AI_GLASSES_BRASIL.pdf](docs/entrega/pitch/PITCH_AI_GLASSES_BRASIL.pdf) |
+
+## Diferenciais
+
+- processamento clínico local, sem envio intencional de conteúdo clínico para IA em nuvem;
+- captura de áudio pelo perfil Bluetooth HFP e foto pontual pela câmera via DAT 0.9;
+- extração factual antes da classificação SOAP, com origem rastreável;
+- consentimento específico, retenção mínima e criptografia local;
+- revisão e confirmação obrigatórias pelo médico;
+- 52 testes automatizados e pipeline validado de ponta a ponta no emulador.
 
 ## Mapa do repositório
 
 | Caminho | Conteúdo |
 |---|---|
-| [docs/entrega/](docs/entrega/) | **Entrega Final**: documento estruturado (MD/PDF) + diagrama de arquitetura (Mermaid/PNG/SVG) |
-| [MEMORY.md](MEMORY.md) | Fonte de verdade: decisões, fatos verificados, datas, pendências |
+| [docs/entrega/](docs/entrega/) | Entrega oficial: documento, arquitetura e apresentação |
 | [docs/PLANO.md](docs/PLANO.md) | Plano mestre até o hackathon (18/09) |
 | [docs/LIMITACOES.md](docs/LIMITACOES.md) | Limitações encontradas × mitigações, com fonte e status (documento vivo) |
 | [docs/LGPD.md](docs/LGPD.md) | Conformidade LGPD / privacidade / checkpoint do edital |
@@ -17,11 +33,10 @@ Consulta médica capturada pelos Ray-Ban Meta Wayfarer Gen 2, processada 100% on
 | [android/](android/) | App companion (Kotlin). Flavors: `sim` (roda sem óculos/token) e `dat` (DAT 0.9.0 real) |
 | [android/TESTING.md](android/TESTING.md) | Guia de testes em 3 níveis: emulador · celular físico · óculos no hackathon |
 | [scripts/](scripts/) | Utilitários (instalação do modelo ASR no aparelho) |
-| [.github/agents/](.github/agents/) | Subagentes: orquestrador, pesquisador, arquiteto-android, lgpd-guardian, redator-entrega |
 | `vendor/meta-wearables-dat-android/` | Clone do repo oficial DAT (referência local; não versionado) |
-| `docs/*.pdf` | Edital e arquitetura v2 |
+| `docs/*.pdf` | Edital e materiais históricos de referência |
 
-## Build do app
+## Executar os testes
 
 ```bash
 cd android
@@ -35,7 +50,7 @@ Flavor `dat` (integração real) exige: `github_token` (escopo `read:packages`) 
 
 **Guia de testes** (emulador · celular físico · óculos no hackathon): [android/TESTING.md](android/TESTING.md).
 
-## Estado atual
+## Estado do MVP
 
 **MVP `sim` funcional e testado fim-a-fim em emulador** (52 testes automatizados): consulta por voz → transcrição PT-BR on-device → rascunho SOAP com validação anti-alucinação → foto e atestado (PDF) por comando de voz → revisão do médico — tudo cifrado, auditado e sem permissão de INTERNET no manifest. Vídeo blindado opcional (indecifrável no aparelho; só custodiante com ordem judicial). Flavor `dat` aguarda credenciais (AND-07). Próximos marcos: Entrega Final (**22/08**), Hackathon (**18/09**, Meta SP).
 

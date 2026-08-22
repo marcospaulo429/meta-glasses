@@ -1,4 +1,4 @@
-const pptxgen = require('/tmp/slidesgen/node_modules/pptxgenjs');
+const pptxgen = require('pptxgenjs');
 const path = require('path');
 
 const pptx = new pptxgen();
@@ -38,6 +38,8 @@ const C = {
 
 const outDir = __dirname;
 const hero = path.join(outDir, 'assets', 'doctor-hero.jpg');
+const repositoryUrl = 'https://github.com/marcospaulo429/meta-glasses';
+const repositoryLabel = 'github.com/marcospaulo429/meta-glasses';
 
 function addHeader(slide, kicker, title, subtitle) {
   slide.addText(kicker.toUpperCase(), {
@@ -60,8 +62,13 @@ function addHeader(slide, kicker, title, subtitle) {
 
 function addFooter(slide, text = 'Assistente de Prontuário Automático · AI Glasses Brasil 2026') {
   slide.addText(text, {
-    x: 0.65, y: 7.03, w: 10.8, h: 0.18,
+    x: 0.65, y: 7.03, w: 5.9, h: 0.18,
     fontFace: 'Aptos', fontSize: 7.5, color: C.muted, margin: 0,
+  });
+  slide.addText(repositoryLabel, {
+    x: 6.65, y: 7.03, w: 5.45, h: 0.18,
+    fontFace: 'Aptos', fontSize: 7.5, color: C.green, margin: 0,
+    align: 'right', hyperlink: { url: repositoryUrl },
   });
 }
 
@@ -133,8 +140,13 @@ function addNotes(slide, lines) {
     fontFace: 'Aptos', fontSize: 8.5, color: 'A9B8B2', margin: 0,
   });
   slide.addText('Assistente de Prontuário Automático', {
-    x: 0.75, y: 6.88, w: 4.6, h: 0.25,
+    x: 0.75, y: 6.76, w: 4.6, h: 0.25,
     fontFace: 'Aptos', fontSize: 9, color: C.white, bold: true, margin: 0,
+  });
+  slide.addText(repositoryLabel, {
+    x: 0.75, y: 7.02, w: 4.9, h: 0.18,
+    fontFace: 'Aptos', fontSize: 7.5, color: C.lime, margin: 0,
+    hyperlink: { url: repositoryUrl },
   });
   addNotes(slide, [
     'Uma consulta deveria ser uma conversa entre médico e paciente.',

@@ -8,6 +8,7 @@ Repositório: <https://github.com/marcospaulo429/meta-glasses>
 
 - [PITCH_AI_GLASSES_BRASIL.pptx](PITCH_AI_GLASSES_BRASIL.pptx) — apresentação editável no formato *PowerPoint Open XML Presentation* (PPTX), com notas do apresentador;
 - [PITCH_AI_GLASSES_BRASIL.pdf](PITCH_AI_GLASSES_BRASIL.pdf) — versão exportada no formato *Portable Document Format* (PDF), para conferência e envio;
+- [ROTEIRO_PITCH.md](ROTEIRO_PITCH.md) — fala completa, explicação de cada slide, transições e respostas para a banca;
 - [preview/](preview/) — prévias dos seis slides.
 
 ## Importar no Canva

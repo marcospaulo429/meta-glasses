@@ -165,10 +165,10 @@ function addNotes(slide, lines) {
     hyperlink: { url: repositoryUrl },
   });
   addNotes(slide, [
-    'Nós somos a Medware.',
-    'Nossa proposta é simples: a consulta fica com o médico; o registro, com a inteligência.',
-    'Mas o médico precisa escutar, raciocinar e documentar ao mesmo tempo.',
-    'Essa disputa reduz o contato visual e frequentemente estende o trabalho para depois do atendimento.',
+    '[0:00–0:25]',
+    'Nós somos a Medware. Nossa proposta é simples: a consulta fica com o médico; o registro, com a inteligência.',
+    'Um estudo publicado por Sinsky e colaboradores observou cerca de duas horas de prontuário e tarefas administrativas para cada hora de atendimento clínico.',
+    'Queremos enfrentar essa disputa por atenção com um assistente clínico mãos livres.',
   ]);
 }
 
@@ -217,9 +217,10 @@ function addNotes(slide, lines) {
   });
   addFooter(slide);
   addNotes(slide, [
-    'Não queríamos assumir que um estudo internacional representava a rotina brasileira.',
-    'O Dr. Ranieri resumiu a tensão central: o prontuário deveria registrar a consulta, não interrompê-la.',
-    'A próxima rodada de entrevistas mede tempo, contato visual, confiança e os principais receios.',
+    '[0:25–0:45]',
+    'Na nossa escuta inicial, o Dr. Ranieri resumiu bem o problema: “O prontuário deveria registrar a consulta, não interrompê-la.”',
+    'Essa fala orientou nossas perguntas sobre tempo, contato visual e confiança.',
+    'Agora, a validação deve medir quatro eixos: precisão, privacidade, revisão médica e bateria.',
   ]);
 }
 
@@ -252,10 +253,11 @@ function addNotes(slide, lines) {
   addPill(slide, '“ENCERRAR CONSULTA”', 9.82, 5.66, 2.4, 'FDE1DA', C.coral);
   addFooter(slide);
   addNotes(slide, [
-    'A Medware é um assistente de prontuário automático para Ray-Ban Meta.',
-    'O médico conduz a consulta sem tocar em telas.',
-    'O áudio é processado localmente no Android, fotos e atestados podem ser solicitados por voz e, ao final, o médico recebe um rascunho para revisar.',
-    'A inteligência artificial prepara; o médico decide.',
+    '[0:45–1:10]',
+    'A Medware permite que o médico conduza a consulta sem alternar continuamente para uma tela.',
+    'O áudio é processado localmente no Android, e comandos de voz permitem registrar uma foto ou preparar um atestado.',
+    'Ao final, o médico recebe um rascunho clínico para editar, confirmar ou descartar.',
+    'A inteligência prepara; o médico decide.',
   ]);
 }
 
@@ -322,11 +324,12 @@ function addNotes(slide, lines) {
   });
   addFooter(slide);
   addNotes(slide, [
-    'Antes de começar, o paciente é informado e registra o consentimento.',
-    'Durante a consulta, o microfone dos óculos envia o áudio ao Android por HFP.',
-    'Ao dizer registrar imagem, o DAT captura uma foto pontual e responde imagem registrada.',
-    'Ao encerrar, a IA organiza apenas fatos presentes na transcrição.',
-    'Em nosso teste, o ASR errou um CID e o sistema corretamente o omitiu.',
+    '[1:10–1:45]',
+    'O fluxo começa pelo consentimento. Depois, médico e paciente conversam normalmente, e somente o conteúdo autorizado entra no sistema.',
+    'Por voz, o médico pode solicitar uma foto ou um rascunho de atestado.',
+    'No Android, a Medware organiza fatos clínicos e preserva a origem de cada informação.',
+    'Por fim, o médico revisa, corrige e confirma.',
+    'Se a transcrição falhar em um código clínico, o sistema omite o dado em vez de inventar.',
   ]);
 }
 
@@ -394,10 +397,12 @@ function addNotes(slide, lines) {
   });
   addFooter(slide, 'Fluxo completo entregue em arquitetura.png + arquitetura.mmd');
   addNotes(slide, [
-    'O DAT 0.9 controla a câmera, enquanto o áudio usa o caminho HFP documentado pela Meta.',
-    'No telefone, o Vosk transcreve e o pipeline organiza os fatos sem gerar informação nova.',
-    'As respostas voltam por TTS.',
-    'Se alguma camada falha, o sistema degrada função antes de perder a consulta.',
+    '[1:45–2:25]',
+    'Os óculos fornecem áudio, câmera e interação mãos livres. No Android, o Vosk transcreve localmente, e o pipeline organiza fatos com origem verificável.',
+    'O médico revisa o resultado, e as confirmações retornam por voz.',
+    'O áudio usa o perfil Bluetooth de chamadas; a câmera usa o toolkit da Meta.',
+    'O conteúdo clínico não é enviado intencionalmente para inteligência em nuvem.',
+    'Se uma camada falhar, reduzimos a automação: preservamos o áudio, usamos o microfone do telefone ou marcamos a informação como não informada.',
   ]);
 }
 
@@ -476,11 +481,12 @@ function addNotes(slide, lines) {
   });
   addFooter(slide);
   addNotes(slide, [
-    'Já validamos o pipeline completo no emulador Android: áudio real, transcrição, foto por voz, SOAP, atestado, criptografia e revisão.',
-    'São 52 testes automatizados.',
-    'Nossa equipe reúne Lucas Pacheco em Android e front-end, Marcos Paulo em inteligência artificial e Lucas Isaac em inteligência artificial, privacidade e requisitos.',
-    'No hackathon, nossa primeira hora será dedicada a validar o HFP, a câmera DAT e a autonomia no hardware real.',
-    'Não queremos substituir o julgamento médico. Queremos devolver ao médico tempo e atenção para o paciente.',
+    '[2:25–3:00]',
+    'Hoje, temos 52 testes automatizados cobrindo o pipeline executado em emulador: prontuário, foto, atestado, cofre criptográfico e revisão.',
+    'O próximo passo é validar no hardware real a voz pelos óculos, a foto pontual e a autonomia por consulta.',
+    'Nosso diferencial combina processamento clínico local, origem verificável e decisão médica.',
+    'Lucas Pacheco lidera Android e front-end; Marcos Paulo, inteligência artificial; e Lucas Isaac, inteligência artificial, privacidade e requisitos.',
+    'A Medware não substitui o médico. Ela devolve tempo e atenção ao paciente.',
   ]);
 }
 

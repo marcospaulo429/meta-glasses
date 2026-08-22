@@ -4,7 +4,7 @@
 
 **Repositório oficial:** <https://github.com/marcospaulo429/meta-glasses>
 
-> O médico atende usando Ray-Ban Meta e sem tocar em telas. O áudio da consulta é processado localmente no Android para gerar um rascunho SOAP rastreável; fotos clínicas e atestados podem ser solicitados por voz. O médico revisa e confirma tudo. O pipeline não envia intencionalmente conteúdo clínico a serviços de IA em nuvem.
+> O médico atende usando Ray-Ban Meta e sem tocar em telas. O áudio da consulta é processado localmente no Android para gerar um rascunho estruturado em Subjetivo, Objetivo, Avaliação e Plano (SOAP); fotos clínicas e atestados podem ser solicitados por voz. O médico revisa e confirma tudo. O pipeline não envia intencionalmente conteúdo clínico a serviços de Inteligência Artificial (IA) em nuvem.
 
 ---
 
@@ -30,16 +30,16 @@ Métricas de sucesso:
 
 **Beneficiários:** paciente, que recebe mais atenção durante o atendimento, e instituição de saúde, que recebe um registro revisado, íntegro e auditável.
 
-**Contexto de uso:** consultas de 20–30 minutos, com smartphone Android pareado e óculos Ray-Ban Meta Gen 2. O telefone permanece guardado durante a consulta e reaparece apenas para o preparo e a revisão.
+**Contexto de uso:** consultas de 20–30 minutos, com smartphone Android pareado e óculos Ray-Ban Meta de segunda geração. O telefone permanece guardado durante a consulta e reaparece apenas para o preparo e a revisão.
 
 ## A3. Walkthrough principal
 
-1. **Preparo:** antes de qualquer captura, o médico informa finalidade, dados tratados, retenção, descarte e possibilidade de recusa/revogação. O companion registra separadamente consentimento para áudio, presença e consentimento de acompanhante, autorização contextual de foto e autorização de CID. Sem consentimento para áudio, a captura não inicia; terceiro que não consinta deve sair da área de captação ou a funcionalidade permanece suspensa.
+1. **Preparo:** antes de qualquer captura, o médico informa finalidade, dados tratados, retenção, descarte e possibilidade de recusa/revogação. O companion registra separadamente consentimento para áudio, presença e consentimento de acompanhante, autorização contextual de foto e autorização de inclusão da Classificação Internacional de Doenças (CID). Sem consentimento para áudio, a captura não inicia; terceiro que não consinta deve sair da área de captação ou a funcionalidade permanece suspensa.
 2. **Início:** o médico toca “Iniciar consulta” e guarda o telefone. Um Foreground Service mantém a captura com tela bloqueada e notificação persistente neutra.
-3. **Áudio:** o Android solicita o microfone dos óculos pelo perfil Bluetooth HFP, conforme a documentação oficial da Meta. O áudio chega ao `AudioRecord` em 8 kHz mono e é processado no telefone.
-4. **IA local:** Vosk PT-BR transcreve com timestamps. O pipeline extrai fatos, exige proveniência e os organiza em S/O/A/P. Lacunas permanecem “não informado” ou “incerto”.
-5. **Foto clínica:** após explicar a finalidade e confirmar autorização específica do paciente e de terceiros enquadrados, o médico diz “registrar imagem”. O app pede confirmação sonora, executa um único burst pelo DAT 0.9 (`addCamera → stream.start → capturePhoto → stop`), cifra a imagem e responde: “Imagem registrada”. Recusar a foto não interrompe o restante da consulta.
-6. **Atestado:** o médico solicita um rascunho por voz. Dias e CID só entram se forem enunciados e permanecem sujeitos à revisão explícita; nunca são inferidos. O CID exige autorização específica e revogável. Sem ela, o atestado segue sem CID. O PDF não é válido como documento médico até receber a assinatura exigida.
+3. **Áudio:** o Android solicita o microfone dos óculos pelo perfil Bluetooth para chamadas em modo mãos livres (*Hands-Free Profile* — HFP), conforme a documentação oficial da Meta. O áudio chega ao `AudioRecord` em 8 kHz mono e é processado no telefone.
+4. **IA local:** Vosk para português brasileiro transcreve com timestamps. O pipeline extrai fatos, exige proveniência e os organiza em SOAP. Lacunas permanecem “não informado” ou “incerto”.
+5. **Foto clínica:** após explicar a finalidade e confirmar autorização específica do paciente e de terceiros enquadrados, o médico diz “registrar imagem”. O app pede confirmação sonora, executa um único burst pelo Kit de Acesso aos Dispositivos (*Device Access Toolkit* — DAT) 0.9 (`addCamera → stream.start → capturePhoto → stop`), cifra a imagem e responde: “Imagem registrada”. Recusar a foto não interrompe o restante da consulta.
+6. **Atestado:** o médico solicita um rascunho por voz. Dias e CID só entram se forem enunciados e permanecem sujeitos à revisão explícita; nunca são inferidos. O CID exige autorização específica e revogável. Sem ela, o atestado segue sem CID. O Formato Portátil de Documento (PDF) gerado não é válido como documento médico até receber a assinatura exigida.
 7. **Encerramento:** “encerrar consulta” fecha os chunks, gera transcrição e rascunho cifrados e responde por áudio com o número de fatos e pendências.
 8. **Revisão humana:** o médico abre a revisão, vê cada fato com o trecho de origem, edita quando necessário e confirma ou descarta. O atestado só vira PDF após confirmação e ainda exige assinatura médica.
 
@@ -54,7 +54,7 @@ Métricas de sucesso:
 | Voz do paciente chega fraca pelo beamforming dos óculos | O médico pode usar o mic do telefone sobre a mesa; óculos permanecem para câmera e áudio de saída. Esse é o teste prioritário no hardware real. |
 | Câmera, bateria ou temperatura entram em condição crítica | A escada remove primeiro vídeo/câmera e preserva áudio; o DAT fornece `ThermalLevel` e erros tipados como `BATTERY_CRITICAL`. |
 | App é encerrado no meio da consulta | Chunks selados a cada 60 s limitam a perda; lacunas ficam documentadas e arquivos temporários são descartados no retorno. |
-| Modelo ASR está ausente | A captura assistida não inicia; o médico é avisado e segue sem o app ou documenta manualmente. Não mantemos áudio indefinidamente para reprocessamento futuro. |
+| Modelo de Reconhecimento Automático de Fala (ASR) está ausente | A captura assistida não inicia; o médico é avisado e segue sem o app ou documenta manualmente. Não mantemos áudio indefinidamente para reprocessamento futuro. |
 | Termo clínico não é reconhecido | Campo fica incerto/não informado. No teste, um CID mal transcrito foi corretamente omitido em vez de inventado. |
 | Paciente pede eliminação | O encontro é descartado e as chaves associadas podem ser destruídas por crypto-erasure. |
 | Acompanhante/terceiro não consente | A captura permanece suspensa; só retoma após a pessoa sair da área ou consentir de forma registrada. |
@@ -68,11 +68,11 @@ Métricas de sucesso:
 
 | Decisão | Por quê | Alternativa descartada |
 |---|---|---|
-| **IA 100% on-device no Android** | Dado de saúde é sensível; o pipeline clínico não envia intencionalmente conteúdo a serviços remotos. O flavor `sim` não declara permissão `INTERNET`; independência integral de rede ainda será validada no flavor DAT. | APIs de ASR/LLM em nuvem: exigem rede e ampliam a superfície LGPD. |
-| **Áudio via HFP do Android; câmera via DAT 0.9** | A Meta documenta HFP como caminho de microfone e `setCommunicationDevice(TYPE_BLUETOOTH_SCO)` no Android. DAT cuida da câmera, não do PCM do mic. | Esperar uma API de mic no DAT; usar vídeo gravado para extrair áudio depois. Ambas inviabilizam o uso ao vivo. |
+| **IA 100% on-device no Android** | Dado de saúde é sensível; o pipeline clínico não envia intencionalmente conteúdo a serviços remotos. O flavor `sim` não declara permissão `INTERNET`; independência integral de rede ainda será validada no flavor DAT. | Interfaces de Programação de Aplicações (APIs) de ASR e Modelo Grande de Linguagem (LLM) em nuvem: exigem rede e ampliam a superfície da Lei Geral de Proteção de Dados Pessoais (LGPD). |
+| **Áudio via HFP do Android; câmera via DAT 0.9** | A Meta documenta HFP como caminho de microfone e `setCommunicationDevice(TYPE_BLUETOOTH_SCO)` no Android. DAT cuida da câmera, não da Modulação por Código de Pulso (PCM) do microfone. | Esperar uma API de microfone no DAT; usar vídeo gravado para extrair áudio depois. Ambas inviabilizam o uso ao vivo. |
 | **Foto como evento, não vídeo contínuo** | `capturePhoto()` exige stream ativo, então usamos burst curto. Reduz bateria, exposição de terceiros e risco de coexistência HFP+câmera. | Stream contínuo como padrão: alto consumo e necessidade/adequação questionáveis em ambiente clínico. |
-| **Extração factual antes do SOAP, com proveniência obrigatória** | No MVP heurístico, o sistema reorganiza fatos e não gera afirmações novas. A métrica `unsupported-statement-rate` será o gate para adotar LLM local depois (meta ≤2%). | LLM escrever o prontuário em uma etapa: alucinação difícil de medir e auditar. |
-| **Cofre local por envelopes criptográficos** | AES-GCM por chunk, DEK por arquivo, KEK no Android Keystore e AAD vinculando chunk à consulta. Limita perda e permite detectar reutilização indevida de chunks quando autenticação e AAD são verificados. | Cifrar tudo apenas ao final ou guardar em servidor: maior perda em crash ou retorno da nuvem. |
+| **Extração factual antes do SOAP, com proveniência obrigatória** | No Produto Mínimo Viável (MVP) heurístico, o sistema reorganiza fatos e não gera afirmações novas. A métrica `unsupported-statement-rate` será o gate para adotar LLM local depois (meta ≤2%). | LLM escrever o prontuário em uma etapa: alucinação difícil de medir e auditar. |
+| **Cofre local por envelopes criptográficos** | Padrão Avançado de Criptografia no modo Galois/Counter (AES-GCM) por chunk, chave de criptografia de dados por arquivo, chave de criptografia de chaves no Android Keystore e dados autenticados adicionais vinculando o chunk à consulta. Limita a perda e permite detectar reutilização indevida de chunks. | Cifrar tudo apenas ao final ou guardar em servidor: maior perda em crash ou retorno da nuvem. |
 
 **Estado técnico honesto:** o flavor `sim` e o pipeline clínico estão implementados e testados em emulador. O flavor `dat` foi escrito a partir do sample oficial, mas ainda depende do token `read:packages`, credenciais do Wearables Developer Center e validação no hardware real. Antes do stream simultâneo, a ordem oficial a validar é `addCamera → estabilizar HFP → stream.start`. O simulador atual é nosso `SimDeviceGateway`; o MockDeviceKit oficial será usado assim que o flavor DAT puder resolver as dependências.
 
@@ -89,10 +89,10 @@ A originalidade não é “mais um resumidor”: é a combinação de **interfac
 
 ### 1. Uso de IA
 
-- **Implementado:** Vosk PT-BR on-device; timestamps; comandos de voz; extração factual; classificação SOAP; campos incertos; atestado por fala.
-- **Evidência:** consulta WAV de 44 s executada de ponta a ponta em emulador; 52 testes automatizados no repositório.
-- **Limite conhecido:** WER formal ainda não medido e o Vosk small errou fármacos/doses.
-- **Meta antes de piloto:** ≥95% de acurácia em entidades críticas e WER/CER medidos em corpus médico PT-BR. Modelo maior ou LLM local só entra se cumprir os gates.
+- **Implementado:** Vosk para português brasileiro on-device; timestamps; comandos de voz; extração factual; classificação SOAP; campos incertos; atestado por fala.
+- **Evidência:** consulta no Formato de Arquivo de Áudio Waveform (WAV) de 44 s executada de ponta a ponta em emulador; 52 testes automatizados no repositório.
+- **Limite conhecido:** Taxa de Erro de Palavras (WER) formal ainda não medida e o Vosk small errou fármacos/doses.
+- **Meta antes de piloto:** ≥95% de acurácia em entidades críticas e WER, além da Taxa de Erro de Caracteres (CER), medidas em corpus médico em português brasileiro. Modelo maior ou LLM local só entra se cumprir os gates.
 
 ### 2. Câmera/microfone
 
@@ -102,7 +102,7 @@ A originalidade não é “mais um resumidor”: é a combinação de **interfac
 
 ### 3. Saída por áudio
 
-Android TTS responde pelos alto-falantes dos óculos via HFP com mensagens curtas: confirmação de imagem/atestado, fallback de rota e resumo final. Durante HFP, a saída é 8 kHz mono; isso é suficiente para confirmações, não para conteúdo longo.
+O sistema de conversão de texto em fala (*Text-to-Speech* — TTS) do Android responde pelos alto-falantes dos óculos via HFP com mensagens curtas: confirmação de imagem/atestado, fallback de rota e resumo final. Durante HFP, a saída é 8 kHz mono; isso é suficiente para confirmações, não para conteúdo longo.
 
 ### 4. Privacidade e segurança
 
@@ -110,7 +110,7 @@ Android TTS responde pelos alto-falantes dos óculos via HFP com mensagens curta
 - consentimento bloqueante, específico por finalidade e revogável;
 - AES-GCM, chaves no Android Keystore, arquivos privados, `allowBackup=false` e auditoria local hash-encadeada destinada a detectar alterações;
 - analytics e crash reporting do DAT desativados e verificados antes da demo;
-- notificação persistente neutra, LED nativo quando a câmera estiver ativa e confirmação sonora de cada foto;
+- notificação persistente neutra, diodo emissor de luz (LED) nativo quando a câmera estiver ativa e confirmação sonora de cada foto;
 - revisão humana obrigatória antes de qualquer registro/documento;
 - retenção mínima e eliminação automática de mídia bruta;
 - demonstrações exclusivamente com atores e dados simulados.
@@ -135,10 +135,10 @@ Dados oficiais do Gen 2: até 8 h em uso misto, aproximadamente 5 h de áudio co
 
 Arquivos para upload:
 
-- imagem: `arquitetura.png` (também disponível em SVG);
+- imagem: `arquitetura.png` (também disponível em Gráficos Vetoriais Escaláveis — SVG);
 - código-fonte: `arquitetura.mmd`.
 
-O diagrama separa óculos, Android e armazenamento local; nomeia HFP, DAT, Vosk, pipeline SOAP, TTS e controles de privacidade. Não há nuvem clínica nem exportação no MVP; FHIR aparece somente como roadmap fora da fronteira funcional entregue.
+O diagrama separa óculos, Android e armazenamento local; nomeia HFP, DAT, Vosk, pipeline SOAP, TTS e controles de privacidade. Não há nuvem clínica nem exportação no MVP; Recursos Rápidos de Interoperabilidade em Saúde (*Fast Healthcare Interoperability Resources* — FHIR) aparecem somente como roadmap fora da fronteira funcional entregue.
 
 ---
 
@@ -148,7 +148,7 @@ O diagrama separa óculos, Android e armazenamento local; nomeia HFP, DAT, Vosk,
 
 **O objetivo central foi mantido:** reduzir a carga de documentação clínica com AI Glasses, gerando um rascunho de prontuário para revisão do médico.
 
-O escopo foi refinado após pesquisa do DAT, da AUP e testes:
+O escopo foi refinado após pesquisa do DAT, da Política de Uso Aceitável (AUP) e testes:
 
 - **removemos vídeo contínuo do MVP** e adotamos foto pontual por comando de voz, porque vídeo permanente aumenta bateria, exposição de terceiros e risco de coexistência Bluetooth;
 - **mantivemos áudio via HFP**, caminho oficial documentado pela Meta, com fallback para o mic do telefone;
@@ -174,4 +174,4 @@ Confirmamos que a proposta, as decisões e os artefatos são de autoria da equip
 3. Meta — bateria dos AI Glasses: <https://www.meta.com/help/ai-glasses/303057485648146/>
 4. Repositório oficial DAT Android e samples: <https://github.com/facebook/meta-wearables-dat-android>
 5. Sinsky C. et al. Allocation of Physician Time in Ambulatory Practice. *Annals of Internal Medicine*, 2016.
-6. Scheffer M. et al. *Demografia Médica no Brasil 2024*. FMUSP/AMB.
+6. Scheffer M. et al. *Demografia Médica no Brasil 2024*. Faculdade de Medicina da Universidade de São Paulo (FMUSP) / Associação Médica Brasileira (AMB).

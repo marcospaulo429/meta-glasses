@@ -9,6 +9,12 @@ Repositório: <https://github.com/marcospaulo429/meta-glasses>
 - [ENTREGA_FINAL.pdf](ENTREGA_FINAL.pdf) — arquivo para envio;
 - [ENTREGA_FINAL.md](ENTREGA_FINAL.md) — fonte editável e versionável.
 
+Para preservar a paginação oficial em seis páginas:
+
+```bash
+npx -y md-to-pdf ENTREGA_FINAL.md --stylesheet entrega.css
+```
+
 ## Seção B — Arquitetura
 
 - [arquitetura.png](arquitetura.png) — imagem para envio;
@@ -19,6 +25,7 @@ Repositório: <https://github.com/marcospaulo429/meta-glasses>
 
 - [pitch/PITCH_AI_GLASSES_BRASIL.pdf](pitch/PITCH_AI_GLASSES_BRASIL.pdf) — versão para apresentação e envio;
 - [pitch/PITCH_AI_GLASSES_BRASIL.pptx](pitch/PITCH_AI_GLASSES_BRASIL.pptx) — versão editável;
+- [pitch/canva/](pitch/canva/) — versão preparada para importação no Canva;
 - [pitch/README.md](pitch/README.md) — instruções de edição e regeneração.
 
 ## Verificação antes do envio

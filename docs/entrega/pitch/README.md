@@ -6,9 +6,13 @@ Repositório: <https://github.com/marcospaulo429/meta-glasses>
 
 ## Arquivos finais
 
-- [PITCH_AI_GLASSES_BRASIL.pptx](PITCH_AI_GLASSES_BRASIL.pptx) — apresentação editável com notas do apresentador;
-- [PITCH_AI_GLASSES_BRASIL.pdf](PITCH_AI_GLASSES_BRASIL.pdf) — versão exportada para conferência e envio;
+- [PITCH_AI_GLASSES_BRASIL.pptx](PITCH_AI_GLASSES_BRASIL.pptx) — apresentação editável no formato *PowerPoint Open XML Presentation* (PPTX), com notas do apresentador;
+- [PITCH_AI_GLASSES_BRASIL.pdf](PITCH_AI_GLASSES_BRASIL.pdf) — versão exportada no formato *Portable Document Format* (PDF), para conferência e envio;
 - [preview/](preview/) — prévias dos seis slides.
+
+## Importar no Canva
+
+O Canva aceita diretamente o arquivo PPTX e tenta preservar seus elementos editáveis. Como alternativa, a pasta [canva/](canva/) contém os seis slides em imagens *Portable Network Graphics* (PNG) de 1920×1080, além de instruções de importação.
 
 ## Regenerar o PPTX
 

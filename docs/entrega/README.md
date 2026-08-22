@@ -12,7 +12,7 @@ Repositório: <https://github.com/marcospaulo429/meta-glasses>
 Para preservar a paginação oficial em seis páginas:
 
 ```bash
-npx -y md-to-pdf ENTREGA_FINAL.md --stylesheet entrega.css
+npx -y md-to-pdf ENTREGA_FINAL.md --css 'body { font-size: 11px !important; line-height: 1.25 !important; }'
 ```
 
 ## Seção B — Arquitetura

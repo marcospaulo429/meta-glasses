@@ -52,7 +52,7 @@ Métricas de sucesso:
 | Voz do paciente chega fraca pelo beamforming dos óculos | O médico pode usar o mic do telefone sobre a mesa; óculos permanecem para câmera e áudio de saída. Esse é o teste prioritário no hardware real. |
 | Câmera, bateria ou temperatura entram em condição crítica | A escada remove primeiro vídeo/câmera e preserva áudio; o DAT fornece `ThermalLevel` e erros tipados como `BATTERY_CRITICAL`. |
 | App é encerrado no meio da consulta | Chunks selados a cada 60 s limitam a perda; lacunas ficam documentadas e arquivos temporários são descartados no retorno. |
-| Modelo ASR está ausente | No perfil temporário, o médico pode optar por áudio cifrado para reprocessamento antes do prazo de eliminação; no perfil restritivo sem mídia, a captura não inicia e o médico segue sem o app/documenta manualmente. |
+| Modelo ASR está ausente | A captura assistida não inicia; o médico é avisado e segue sem o app ou documenta manualmente. Não mantemos áudio indefinidamente para reprocessamento futuro. |
 | Termo clínico não é reconhecido | Campo fica incerto/não informado. No teste, um CID mal transcrito foi corretamente omitido em vez de inventado. |
 | Paciente pede eliminação | O encontro é descartado e as chaves associadas podem ser destruídas por crypto-erasure. |
 | Acompanhante/terceiro não consente | A captura permanece suspensa; só retoma após a pessoa sair da área ou consentir de forma registrada. |
@@ -115,7 +115,7 @@ Android TTS responde pelos alto-falantes dos óculos via HFP com mensagens curta
 
 Na submissão e na demo, os atores serão previamente informados sobre a captura; não serão usados pacientes reais, dados clínicos reais nem ambientes de atendimento em funcionamento. A desativação de analytics/crash reporting e a ausência de conteúdo clínico em logs, notificações e telemetria serão registradas em checklist pré-demo.
 
-**AUP e local sensível:** tratamos consultório preventivamente como local sensível. Consentimento mitiga riscos LGPD, mas não anula eventual restrição contratual da Meta. Até confirmação formal, demonstrações usarão somente atores. Se a Meta vedar persistência de sensores nesse contexto, o perfil restritivo desativa áudio bruto, fotos e reprocessamento: a fala usa buffers voláteis descartados após a inferência, e só o rascunho textual mínimo permanece. Nesse perfil, proveniência é textual/temporal, sem reprodução do áudio. Vídeo contínuo não faz parte do MVP.
+**Uso responsável em ambiente clínico:** o MVP adota uma única política conservadora: consentimento específico e revogável, nenhuma captura encoberta, câmera somente por evento, nenhum vídeo contínuo e retenção temporária do áudio cifrado apenas até a revisão. Demonstrações usam exclusivamente atores e dados simulados. Uso com pacientes reais depende de validação institucional, jurídica e das regras vigentes da plataforma antes do piloto.
 
 ### 5. Eficiência de bateria
 
@@ -157,7 +157,7 @@ Essas mudanças preservam o problema e tornam o MVP mais viável, testável e ad
 
 ## D2. Coerência entre artefatos
 
-Confirmamos que documento, diagrama e roteiro do vídeo-pitch descrevem o mesmo MVP e distinguem dois perfis: **local com retenção temporária cifrada**, no qual áudio bruto é eliminado após revisão e fotos rejeitadas são eliminadas; e **restritivo sem mídia bruta**, acionado se exigido pela AUP, sem reprocessamento ou reprodução posterior. Ambos exigem consentimento, revisão humana e demonstração somente com atores.
+Confirmamos que documento, diagrama e roteiro do vídeo-pitch descrevem o mesmo MVP: processamento clínico local, áudio temporário cifrado eliminado após revisão, fotos pontuais autorizadas e eliminação imediata das rejeitadas, sem vídeo contínuo, com revisão humana obrigatória e demonstração somente com atores.
 
 ## D3. Autoria e uso de IA
 

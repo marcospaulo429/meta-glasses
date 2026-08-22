@@ -39,7 +39,6 @@ flowchart TB
             AUDIT["Auditoria hash-encadeada<br/>consentimento · hashes · gaps"]
         end
 
-        AUPMODE["Perfil restritivo AUP<br/>buffers volateis<br/>sem audio/foto persistidos"]
         REVIEW["Revisao humana obrigatoria<br/>editar · confirmar · descartar"]
         PDF["Rascunho PDF de atestado<br/>CID autorizado<br/>valido somente apos assinatura"]
     end
@@ -53,8 +52,6 @@ flowchart TB
     ROOM --> REC
     REC --> ASR
     REC -->|"audio cifrado"| CRYPTO
-    REC -. "se exigido pela Meta" .-> AUPMODE
-    AUPMODE --> ASR
     ASR --> COMMANDS
     ASR --> FACTS --> SOAP --> VALID
     ASR --> CERT

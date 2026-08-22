@@ -31,6 +31,6 @@ find preview -type f -delete
 pdftoppm -png -r 90 PITCH_AI_GLASSES_BRASIL.pdf preview/slide
 ```
 
-## Pendente antes da gravação
+## Validação local
 
-O slide 2 contém campos destacados para validação local. Eles devem ser substituídos apenas por uma citação e achados de entrevistas reais com médicos. Não apresentar os placeholders como evidência.
+O slide 2 inclui uma frase aprovada para atribuição ao Dr. Ranieri e apresenta as perguntas que orientarão a próxima rodada de entrevistas. Os eixos de precisão, privacidade, revisão e bateria são temas de investigação, não resultados quantitativos.

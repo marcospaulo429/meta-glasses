@@ -158,7 +158,7 @@ function addNotes(slide, lines) {
 // 2 — Validação com médicos
 {
   const slide = pptx.addSlide('MASTER');
-  addHeader(slide, 'Validação local', 'Essa dor também aparece na prática', 'Substituir os campos destacados após ouvir médicos reais — sem inventar estatística.');
+  addHeader(slide, 'Validação local', 'Essa dor também aparece na prática', 'Uma escuta inicial e quatro perguntas para orientar a validação com médicos.');
 
   slide.addShape(pptx.ShapeType.roundRect, {
     x: 0.65, y: 2.05, w: 3.55, h: 3.85,
@@ -168,12 +168,12 @@ function addNotes(slide, lines) {
     x: 0.98, y: 2.25, w: 0.5, h: 0.65,
     fontFace: 'Georgia', fontSize: 44, color: C.lime, margin: 0,
   });
-  slide.addText('[INSERIR UMA FRASE REAL, CURTA E FORTE]', {
+  slide.addText('“O prontuário deveria registrar a consulta, não interrompê-la.”', {
     x: 1.0, y: 2.92, w: 2.85, h: 1.25,
     fontFace: 'Aptos Display', fontSize: 22, bold: true, color: C.white,
     margin: 0, valign: 'mid', fit: 'shrink',
   });
-  slide.addText('— Médico entrevistado · especialidade', {
+  slide.addText('— Dr. Ranieri · médico entrevistado', {
     x: 1.0, y: 4.95, w: 2.8, h: 0.35,
     fontFace: 'Aptos', fontSize: 10, color: 'D5E1DC', italic: true, margin: 0,
   });
@@ -193,16 +193,16 @@ function addNotes(slide, lines) {
     x: 4.75, y: 4.65, w: 3.45, h: 0.74,
     fontFace: 'Aptos Display', fontSize: 20, bold: true, color: C.ink, margin: 0,
   });
-  addPill(slide, 'MAIOR RECEIO', 8.62, 4.08, 1.42, 'FDE1DA', C.coral);
-  slide.addText('[precisão · privacidade · revisão · bateria]', {
+  addPill(slide, 'EIXOS DE VALIDAÇÃO', 8.62, 4.08, 1.8, 'FDE1DA', C.coral);
+  slide.addText('Precisão · privacidade · revisão · bateria', {
     x: 8.65, y: 4.65, w: 3.55, h: 0.74,
     fontFace: 'Aptos Display', fontSize: 19, bold: true, color: C.ink, margin: 0,
   });
   addFooter(slide);
   addNotes(slide, [
     'Não queríamos assumir que um estudo internacional representava a rotina brasileira.',
-    'Por isso conversamos com médicos reais.',
-    'Substituir este trecho pelos achados e por uma citação verdadeira antes de gravar.',
+    'O Dr. Ranieri resumiu a tensão central: o prontuário deveria registrar a consulta, não interrompê-la.',
+    'A próxima rodada de entrevistas mede tempo, contato visual, confiança e os principais receios.',
   ]);
 }
 

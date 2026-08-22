@@ -24,7 +24,7 @@ Repositório: <https://github.com/marcospaulo429/meta-glasses>
 ## Verificação antes do envio
 
 - confirmar que documento, arquitetura e vídeo descrevem o mesmo MVP;
-- substituir os campos provisórios do slide 2 somente por entrevistas reais;
+- confirmar a autorização das citações atribuídas e não apresentar eixos de entrevista como resultados;
 - conferir nomes da equipe e regras da plataforma de submissão;
 - abrir os PDFs finais e testar todos os links;
 - usar apenas atores e dados simulados na demonstração.

@@ -1,4 +1,4 @@
-# LGPD e Privacidade — Assistente de Prontuário Automático
+# LGPD e Privacidade — Medware
 
 > Análise de conformidade com a Lei nº 13.709/2018 (LGPD) e desenho privacy-by-design.
 > Este documento alimenta diretamente o checkpoint obrigatório "Privacidade e dados" (edital, Seção 8.1) e o critério "Considerações éticas" (20 pts no Segundo Filtro).

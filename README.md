@@ -1,6 +1,6 @@
-# Assistente de Prontuário Automático
+# Medware
 
-Projeto da trilha **Bem-Estar** do Programa AI Glasses Brasil 2026 (CEIA/UFG/FUNAPE/Meta).
+**Assistente de prontuário automático** da trilha Bem-Estar do Programa AI Glasses Brasil 2026 (CEIA/UFG/FUNAPE/Meta).
 
 O médico conduz a consulta com Ray-Ban Meta, sem tocar em telas. O Android processa o áudio localmente, extrai fatos com proveniência e prepara um rascunho SOAP. Fotos clínicas e atestados podem ser solicitados por voz. Nada se torna registro oficial sem revisão humana.
 

@@ -188,7 +188,7 @@ class MainActivity : AppCompatActivity() {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(24), dp(24), dp(24), dp(24))
             addView(TextView(context).apply {
-                text = "Assistente de Prontuário — captura"
+                text = "Medware — captura"
                 textSize = 20f
             })
             addView(patientConsent)

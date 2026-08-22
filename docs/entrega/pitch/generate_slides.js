@@ -3,9 +3,9 @@ const path = require('path');
 
 const pptx = new pptxgen();
 pptx.layout = 'LAYOUT_WIDE';
-pptx.author = 'Equipe Assistente de Prontuário Automático';
+pptx.author = 'Equipe Medware';
 pptx.subject = 'Vídeo-pitch — AI Glasses Brasil 2026';
-pptx.title = 'Assistente de Prontuário Automático';
+pptx.title = 'Medware — Assistente de Prontuário Automático';
 pptx.company = 'AI Glasses Brasil 2026';
 pptx.lang = 'pt-BR';
 pptx.theme = {
@@ -60,7 +60,7 @@ function addHeader(slide, kicker, title, subtitle) {
   }
 }
 
-function addFooter(slide, text = 'Assistente de Prontuário Automático · AI Glasses Brasil 2026') {
+function addFooter(slide, text = 'Medware · AI Glasses Brasil 2026') {
   slide.addText(text, {
     x: 0.65, y: 7.03, w: 5.9, h: 0.18,
     fontFace: 'Aptos', fontSize: 7.5, color: C.muted, margin: 0,
@@ -100,7 +100,7 @@ function addNotes(slide, lines) {
   if (typeof slide.addNotes === 'function') slide.addNotes(lines.join('\n'));
 }
 
-// 1 — Problema
+// 1 — Marca + problema
 {
   const slide = pptx.addSlide();
   slide.background = { color: '0B211B' };
@@ -110,38 +110,54 @@ function addNotes(slide, lines) {
     fill: { color: '0B211B', transparency: 20 },
     line: { color: '0B211B', transparency: 100 },
   });
-  slide.addText('O PRONTUÁRIO DISPUTA\nATENÇÃO COM O PACIENTE', {
-    x: 0.72, y: 0.72, w: 5.6, h: 1.45,
-    fontFace: 'Aptos Display', fontSize: 29, bold: true, color: C.white,
-    margin: 0, breakLine: false, fit: 'shrink',
+  slide.addText('AI GLASSES BRASIL 2026  ·  BEM-ESTAR', {
+    x: 0.75, y: 0.48, w: 4.9, h: 0.24,
+    fontFace: 'Aptos', fontSize: 9.5, bold: true, color: 'A9B8B2',
+    charSpacing: 1.5, margin: 0,
   });
-  slide.addText('Escutar, raciocinar e documentar — ao mesmo tempo.', {
-    x: 0.75, y: 2.35, w: 4.85, h: 0.65,
-    fontFace: 'Aptos', fontSize: 17, color: 'D5E1DC', margin: 0,
+  slide.addText([
+    { text: 'MED', options: { color: C.white, bold: true } },
+    { text: 'WARE', options: { color: C.lime, bold: true } },
+  ], {
+    x: 0.72, y: 0.88, w: 4.9, h: 0.78,
+    fontFace: 'Aptos Display', fontSize: 43, margin: 0,
+    breakLine: false, fit: 'shrink',
   });
   slide.addShape(pptx.ShapeType.line, {
-    x: 0.75, y: 3.25, w: 4.7, h: 0,
-    line: { color: C.lime, width: 2 },
+    x: 0.75, y: 1.78, w: 0.86, h: 0,
+    line: { color: C.coral, width: 4 },
   });
-  slide.addText('ATÉ', {
-    x: 0.75, y: 3.62, w: 0.75, h: 0.3,
+  slide.addText('A consulta fica com o médico.\nO registro, com a inteligência.', {
+    x: 0.75, y: 2.08, w: 4.95, h: 0.95,
+    fontFace: 'Aptos Display', fontSize: 23, bold: true, color: C.white,
+    margin: 0, breakLine: false, fit: 'shrink',
+  });
+  slide.addText('Um assistente clínico mãos livres que transforma a consulta em rascunho de prontuário para revisão médica.', {
+    x: 0.75, y: 3.25, w: 4.75, h: 0.7,
+    fontFace: 'Aptos', fontSize: 14.5, color: 'D5E1DC', margin: 0,
+    breakLine: false, fit: 'shrink',
+  });
+  slide.addText('O PROBLEMA', {
+    x: 0.75, y: 4.22, w: 1.8, h: 0.25,
     fontFace: 'Aptos', fontSize: 12, bold: true, color: C.lime, margin: 0,
+    charSpacing: 1.2,
   });
   slide.addText('2h', {
-    x: 0.75, y: 3.95, w: 1.25, h: 0.92,
-    fontFace: 'Aptos Display', fontSize: 49, bold: true, color: C.white, margin: 0,
+    x: 0.75, y: 4.62, w: 1.3, h: 0.85,
+    fontFace: 'Aptos Display', fontSize: 46, bold: true, color: C.white, margin: 0,
   });
   slide.addText('de prontuário e tarefas administrativas\npara cada 1h de atendimento clínico', {
-    x: 2.05, y: 4.05, w: 3.3, h: 0.72,
-    fontFace: 'Aptos', fontSize: 14, color: C.white, margin: 0,
+    x: 2.02, y: 4.7, w: 3.45, h: 0.65,
+    fontFace: 'Aptos', fontSize: 13.5, color: C.white, margin: 0,
   });
   slide.addText('Sinsky et al. · Annals of Internal Medicine · 2016', {
-    x: 0.76, y: 5.02, w: 4.8, h: 0.28,
+    x: 0.76, y: 5.62, w: 4.8, h: 0.24,
     fontFace: 'Aptos', fontSize: 8.5, color: 'A9B8B2', margin: 0,
   });
-  slide.addText('Assistente de Prontuário Automático', {
-    x: 0.75, y: 6.76, w: 4.6, h: 0.25,
-    fontFace: 'Aptos', fontSize: 9, color: C.white, bold: true, margin: 0,
+  slide.addText('MEDWARE  ·  ASSISTENTE DE PRONTUÁRIO AUTOMÁTICO', {
+    x: 0.75, y: 6.76, w: 4.9, h: 0.25,
+    fontFace: 'Aptos', fontSize: 8.5, color: C.white, bold: true, margin: 0,
+    charSpacing: 0.8,
   });
   slide.addText(repositoryLabel, {
     x: 0.75, y: 7.02, w: 4.9, h: 0.18,
@@ -149,7 +165,8 @@ function addNotes(slide, lines) {
     hyperlink: { url: repositoryUrl },
   });
   addNotes(slide, [
-    'Uma consulta deveria ser uma conversa entre médico e paciente.',
+    'Nós somos a Medware.',
+    'Nossa proposta é simples: a consulta fica com o médico; o registro, com a inteligência.',
     'Mas o médico precisa escutar, raciocinar e documentar ao mesmo tempo.',
     'Essa disputa reduz o contato visual e frequentemente estende o trabalho para depois do atendimento.',
   ]);
@@ -235,7 +252,7 @@ function addNotes(slide, lines) {
   addPill(slide, '“ENCERRAR CONSULTA”', 9.82, 5.66, 2.4, 'FDE1DA', C.coral);
   addFooter(slide);
   addNotes(slide, [
-    'Nossa proposta é um assistente de prontuário automático para Ray-Ban Meta.',
+    'A Medware é um assistente de prontuário automático para Ray-Ban Meta.',
     'O médico conduz a consulta sem tocar em telas.',
     'O áudio é processado localmente no Android, fotos e atestados podem ser solicitados por voz e, ao final, o médico recebe um rascunho para revisar.',
     'A inteligência artificial prepara; o médico decide.',

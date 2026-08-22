@@ -2,7 +2,7 @@
   "name": "apresentacao-assistente-prontuario-automatico",
   "version": "1.0.0",
   "private": true,
-  "description": "Gerador da apresentação do Assistente de Prontuário Automático para o AI Glasses Brasil 2026.",
+  "description": "Gerador da apresentação da Medware para o AI Glasses Brasil 2026.",
   "scripts": {
     "gerar": "node generate_slides.js"
   },

@@ -1,6 +1,6 @@
 # Apresentação
 
-Apresentação de seis slides para o vídeo-pitch do **Assistente de Prontuário Automático**.
+Apresentação de seis slides para o vídeo-pitch da **Medware**, assistente de prontuário automático.
 
 Repositório: <https://github.com/marcospaulo429/meta-glasses>
 

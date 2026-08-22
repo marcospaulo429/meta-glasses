@@ -1,4 +1,4 @@
-# Plano Mestre — Assistente de Prontuário Automático
+# Plano Mestre — Medware
 
 > Planejamento completo até o hackathon (18/09). Sem implementação da ideia até o fim do planejamento.
 > Documentos irmãos: [MEMORY.md](../MEMORY.md) · [LIMITACOES.md](LIMITACOES.md) · [LGPD.md](LGPD.md) · [PESQUISA.md](PESQUISA.md)

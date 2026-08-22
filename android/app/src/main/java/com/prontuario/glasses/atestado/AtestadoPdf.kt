@@ -48,7 +48,7 @@ object AtestadoPdf {
         line("________________________________________", body, 18f)
         line(draft.doctorName ?: "Nome do médico", body, 18f)
         line(draft.doctorCrm ?: "CRM", body, 40f)
-        line("Documento gerado pelo Assistente de Prontuário a partir de consulta com", small, 12f)
+        line("Documento gerado pela Medware a partir de consulta com", small, 12f)
         line("consentimento registrado; conteúdo revisado e confirmado pelo médico.", small, 12f)
         line("Sem validade até assinatura do médico. Trecho de origem auditável no prontuário.", small, 12f)
 

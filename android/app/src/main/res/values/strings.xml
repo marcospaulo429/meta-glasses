@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Prontuário Glasses</string>
+    <string name="app_name">Medware</string>
     <string name="notification_channel_name">Consulta em andamento</string>
     <string name="notification_channel_description">Indica que há captura de consulta ativa</string>
     <!-- Notificação sem conteúdo clínico (docs/LGPD.md §5) -->

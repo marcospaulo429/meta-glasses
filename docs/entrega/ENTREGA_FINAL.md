@@ -1,10 +1,10 @@
-# Entrega Final da Ideia — Assistente de Prontuário Automático
+# Entrega Final da Ideia — Medware
 
 **Programa AI Glasses Brasil 2026 · Trilha Bem-Estar · 22/08/2026**
 
 **Repositório oficial:** <https://github.com/marcospaulo429/meta-glasses>
 
-> O médico atende usando Ray-Ban Meta e sem tocar em telas. O áudio da consulta é processado localmente no Android para gerar um rascunho estruturado em Subjetivo, Objetivo, Avaliação e Plano (SOAP); fotos clínicas e atestados podem ser solicitados por voz. O médico revisa e confirma tudo. O pipeline não envia intencionalmente conteúdo clínico a serviços de Inteligência Artificial (IA) em nuvem.
+> A **Medware** é um assistente de prontuário automático para consultas mãos livres. O médico atende usando Ray-Ban Meta e sem tocar em telas. O áudio é processado localmente no Android para gerar um rascunho estruturado em Subjetivo, Objetivo, Avaliação e Plano (SOAP); fotos clínicas e atestados podem ser solicitados por voz. O médico revisa e confirma tudo. O pipeline não envia intencionalmente conteúdo clínico a serviços de Inteligência Artificial (IA) em nuvem.
 
 ---
 

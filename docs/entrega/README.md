@@ -1,6 +1,6 @@
 # Entrega Final da Ideia
 
-Artefatos oficiais do **Assistente de Prontuário Automático** para o Programa AI Glasses Brasil 2026.
+Artefatos oficiais da **Medware**, assistente de prontuário automático para o Programa AI Glasses Brasil 2026.
 
 Repositório: <https://github.com/marcospaulo429/meta-glasses>
 

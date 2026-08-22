@@ -226,7 +226,7 @@ function addNotes(slide, lines) {
   });
 
   addBullet(slide, 'Consulta sem tocar em telas', 5.05, 2.05, 6.8);
-  addBullet(slide, 'Prontuário SOAP processado localmente', 5.05, 2.92, 6.8);
+  addBullet(slide, 'Prontuário clínico processado localmente', 5.05, 2.92, 6.8);
   addBullet(slide, 'Foto e atestado por comando de voz', 5.05, 3.79, 6.8);
   addBullet(slide, 'Médico revisa e confirma tudo', 5.05, 4.66, 6.8, C.ink, C.coral);
 
@@ -238,7 +238,7 @@ function addNotes(slide, lines) {
     'Nossa proposta é um assistente de prontuário automático para Ray-Ban Meta.',
     'O médico conduz a consulta sem tocar em telas.',
     'O áudio é processado localmente no Android, fotos e atestados podem ser solicitados por voz e, ao final, o médico recebe um rascunho para revisar.',
-    'A IA prepara; o médico decide.',
+    'A inteligência artificial prepara; o médico decide.',
   ]);
 }
 
@@ -249,9 +249,9 @@ function addNotes(slide, lines) {
 
   const steps = [
     ['1', 'CONSENTIR', 'Finalidade e autorizações'],
-    ['2', 'CONVERSAR', 'Áudio via HFP'],
+    ['2', 'CONVERSAR', 'Áudio pelos óculos'],
     ['3', 'REGISTRAR', 'Foto e atestado por voz'],
-    ['4', 'ESTRUTURAR', 'SOAP local com proveniência'],
+    ['4', 'ESTRUTURAR', 'Prontuário com origem'],
     ['5', 'REVISAR', 'Editar, confirmar ou descartar'],
   ];
   const startX = 0.72;
@@ -299,7 +299,7 @@ function addNotes(slide, lines) {
     x: 1.55, y: 5.35, w: 10.15, h: 0.72,
     fill: { color: 'FFF3D1' }, line: { color: C.amber, width: 1 }, radius: 0.05,
   });
-  slide.addText('ASR não reconheceu um CID? O sistema omite o dado — não tenta adivinhar.', {
+  slide.addText('A transcrição falhou em um código clínico? O sistema omite — não tenta adivinhar.', {
     x: 1.85, y: 5.57, w: 9.55, h: 0.26,
     fontFace: 'Aptos', fontSize: 14, bold: true, color: '6B5110', align: 'center', margin: 0,
   });
@@ -316,12 +316,12 @@ function addNotes(slide, lines) {
 // 5 — Arquitetura + exceções
 {
   const slide = pptx.addSlide('MASTER');
-  addHeader(slide, 'Como funciona', 'IA local. Médico no controle.', 'Uma arquitetura estreita, auditável e desenhada para degradar com segurança.');
+  addHeader(slide, 'Como funciona', 'Inteligência local. Médico no controle.', 'Uma arquitetura estreita, auditável e desenhada para degradar com segurança.');
 
   const boxes = [
-    { x: 0.72, w: 2.35, title: 'ÓCULOS', detail: 'HFP + câmera DAT 0.9', fill: C.green, fg: C.white },
+    { x: 0.72, w: 2.35, title: 'ÓCULOS', detail: 'Áudio + câmera Meta', fill: C.green, fg: C.white },
     { x: 3.42, w: 2.35, title: 'ANDROID LOCAL', detail: 'AudioRecord + Vosk', fill: C.mint, fg: C.ink },
-    { x: 6.12, w: 2.35, title: 'IA CLÍNICA', detail: 'Fatos + SOAP + origem', fill: C.pale, fg: C.ink },
+    { x: 6.12, w: 2.35, title: 'PIPELINE CLÍNICO', detail: 'Fatos + prontuário + origem', fill: C.pale, fg: C.ink },
     { x: 8.82, w: 2.35, title: 'REVISÃO', detail: 'Editar · confirmar · excluir', fill: 'FDE1DA', fg: C.ink },
   ];
   boxes.forEach((b, i) => {
@@ -354,7 +354,7 @@ function addNotes(slide, lines) {
     x: 11.82, y: 2.15, w: 0.84, h: 1.38,
     fill: { color: C.ink }, line: { color: C.ink }, radius: 0.05,
   });
-  slide.addText('TTS', {
+  slide.addText('VOZ', {
     x: 11.95, y: 2.65, w: 0.58, h: 0.25,
     fontFace: 'Aptos Display', fontSize: 16, bold: true, color: C.white, align: 'center', margin: 0,
   });
@@ -364,14 +364,14 @@ function addNotes(slide, lines) {
     fontFace: 'Aptos', fontSize: 11, bold: true, color: C.coral, charSpacing: 1.1, margin: 0,
   });
   addBullet(slide, 'Câmera ou bateria crítica → preserva o áudio', 0.78, 4.75, 3.65, C.ink, C.coral);
-  addBullet(slide, 'HFP indisponível → mic do telefone', 4.6, 4.75, 3.45, C.ink, C.coral);
-  addBullet(slide, 'ASR incerto → não informado, nunca inferido', 8.25, 4.75, 4.25, C.ink, C.coral);
+  addBullet(slide, 'Áudio dos óculos indisponível → mic do telefone', 4.6, 4.75, 3.45, C.ink, C.coral);
+  addBullet(slide, 'Transcrição incerta → não informado, nunca inferido', 8.25, 4.75, 4.25, C.ink, C.coral);
 
   slide.addShape(pptx.ShapeType.roundRect, {
     x: 3.75, y: 5.85, w: 5.85, h: 0.55,
     fill: { color: C.green }, line: { color: C.green }, radius: 0.05,
   });
-  slide.addText('Sem IA em nuvem · retenção mínima · revisão humana', {
+  slide.addText('Sem inteligência em nuvem · retenção mínima · revisão humana', {
     x: 4.05, y: 6.03, w: 5.25, h: 0.2,
     fontFace: 'Aptos', fontSize: 12, bold: true, color: C.white, align: 'center', margin: 0,
   });
@@ -387,24 +387,24 @@ function addNotes(slide, lines) {
 // 6 — Evidência e fechamento
 {
   const slide = pptx.addSlide('MASTER');
-  addHeader(slide, 'Evidência e próximos passos', 'Não é apenas uma ideia', 'O risco restante está concentrado e tem protocolo de validação.');
+  addHeader(slide, 'Evidência, equipe e próximos passos', 'Não é apenas uma ideia', 'Execução comprovada, competências complementares e um próximo teste objetivo.');
 
   slide.addShape(pptx.ShapeType.roundRect, {
-    x: 0.72, y: 2.02, w: 3.5, h: 3.85,
+    x: 0.72, y: 2.02, w: 3.5, h: 3.15,
     fill: { color: C.green }, line: { color: C.green }, radius: 0.07,
   });
   slide.addText('52', {
-    x: 1.2, y: 2.42, w: 2.55, h: 1.05,
+    x: 1.2, y: 2.25, w: 2.55, h: 0.95,
     fontFace: 'Aptos Display', fontSize: 58, bold: true, color: C.white,
     align: 'center', margin: 0,
   });
   slide.addText('testes automatizados', {
-    x: 1.15, y: 3.5, w: 2.65, h: 0.38,
+    x: 1.15, y: 3.25, w: 2.65, h: 0.38,
     fontFace: 'Aptos', fontSize: 15, bold: true, color: C.lime,
     align: 'center', margin: 0,
   });
-  slide.addText('Pipeline Android de ponta a ponta\nSOAP · foto · atestado · cofre · revisão', {
-    x: 1.05, y: 4.25, w: 2.85, h: 0.85,
+  slide.addText('Pipeline Android de ponta a ponta\nprontuário · foto · atestado · cofre · revisão', {
+    x: 1.05, y: 3.92, w: 2.85, h: 0.72,
     fontFace: 'Aptos', fontSize: 13, color: C.white,
     align: 'center', valign: 'mid', margin: 0,
   });
@@ -413,8 +413,8 @@ function addNotes(slide, lines) {
     x: 4.82, y: 2.06, w: 2.75, h: 0.28,
     fontFace: 'Aptos', fontSize: 11, bold: true, color: C.coral, charSpacing: 1.1, margin: 0,
   });
-  addBullet(slide, 'Captura HFP da voz do paciente', 4.85, 2.62, 3.1, C.ink, C.coral);
-  addBullet(slide, 'Burst de foto com DAT 0.9', 4.85, 3.45, 3.1, C.ink, C.coral);
+  addBullet(slide, 'Captura da voz pelos óculos', 4.85, 2.62, 3.1, C.ink, C.coral);
+  addBullet(slide, 'Foto pontual com o toolkit Meta', 4.85, 3.45, 3.1, C.ink, C.coral);
   addBullet(slide, 'Autonomia por consulta', 4.85, 4.28, 3.1, C.ink, C.coral);
 
   slide.addText('NOSSO DIFERENCIAL', {
@@ -425,19 +425,43 @@ function addNotes(slide, lines) {
   addBullet(slide, 'Proveniência fato a fato', 8.62, 3.45, 3.7);
   addBullet(slide, 'Médico sempre no controle', 8.62, 4.28, 3.7);
 
-  slide.addShape(pptx.ShapeType.roundRect, {
-    x: 4.82, y: 5.35, w: 7.35, h: 0.75,
-    fill: { color: C.ink }, line: { color: C.ink }, radius: 0.05,
+  slide.addText('EQUIPE', {
+    x: 0.75, y: 5.43, w: 1.0, h: 0.25,
+    fontFace: 'Aptos', fontSize: 10.5, bold: true, color: C.green,
+    charSpacing: 1.1, margin: 0,
+  });
+  const team = [
+    ['LUCAS PACHECO', 'Android e front-end'],
+    ['MARCOS PAULO', 'Inteligência artificial'],
+    ['LUCAS ISAAC', 'Inteligência artificial, privacidade e requisitos'],
+  ];
+  team.forEach((member, index) => {
+    const x = 0.75 + index * 4.13;
+    slide.addShape(pptx.ShapeType.line, {
+      x, y: 5.82, w: 3.65, h: 0,
+      line: { color: index === 2 ? C.coral : C.green, width: 2 },
+    });
+    slide.addText(member[0], {
+      x, y: 5.98, w: 3.65, h: 0.24,
+      fontFace: 'Aptos Display', fontSize: 13, bold: true, color: C.ink,
+      margin: 0, fit: 'shrink',
+    });
+    slide.addText(member[1], {
+      x, y: 6.28, w: 3.65, h: 0.3,
+      fontFace: 'Aptos', fontSize: 10.5, color: C.muted,
+      margin: 0, fit: 'shrink',
+    });
   });
   slide.addText('Devolver ao médico tempo e atenção para o paciente.', {
-    x: 5.15, y: 5.58, w: 6.7, h: 0.27,
-    fontFace: 'Aptos Display', fontSize: 18, bold: true, color: C.white,
+    x: 3.25, y: 6.67, w: 6.85, h: 0.25,
+    fontFace: 'Aptos Display', fontSize: 15, bold: true, color: C.green,
     align: 'center', margin: 0,
   });
   addFooter(slide);
   addNotes(slide, [
     'Já validamos o pipeline completo no emulador Android: áudio real, transcrição, foto por voz, SOAP, atestado, criptografia e revisão.',
     'São 52 testes automatizados.',
+    'Nossa equipe reúne Lucas Pacheco em Android e front-end, Marcos Paulo em inteligência artificial e Lucas Isaac em inteligência artificial, privacidade e requisitos.',
     'No hackathon, nossa primeira hora será dedicada a validar o HFP, a câmera DAT e a autonomia no hardware real.',
     'Não queremos substituir o julgamento médico. Queremos devolver ao médico tempo e atenção para o paciente.',
   ]);

@@ -38,3 +38,16 @@ pdftoppm -png -r 90 PITCH_AI_GLASSES_BRASIL.pdf preview/slide
 ## Validação local
 
 O slide 2 inclui uma frase aprovada para atribuição ao Dr. Ranieri e apresenta as perguntas que orientarão a próxima rodada de entrevistas. Os eixos de precisão, privacidade, revisão e bateria são temas de investigação, não resultados quantitativos.
+
+## Estrutura do pitch
+
+O roteiro segue a estrutura recomendada no workshop oficial:
+
+1. problema e relevância;
+2. validação local;
+3. solução;
+4. funcionamento do Produto Mínimo Viável (MVP);
+5. impacto, diferencial e viabilidade técnica;
+6. equipe e próximos passos.
+
+Distribuição sugerida para três minutos: 25 s, 20 s, 25 s, 35 s, 40 s e 35 s, respectivamente.

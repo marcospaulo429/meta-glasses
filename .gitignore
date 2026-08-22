@@ -6,6 +6,10 @@ __pycache__/
 # Vendored reference clones (not part of this repo)
 vendor/
 
+# Local OS/reference artifacts
+.DS_Store
+Slides-*.zip
+
 # Android
 android/.gradle/
 android/build/

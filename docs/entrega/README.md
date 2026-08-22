@@ -8,6 +8,7 @@ Repositório: <https://github.com/marcospaulo429/meta-glasses>
 
 - [ENTREGA_FINAL.pdf](ENTREGA_FINAL.pdf) — arquivo para envio;
 - [ENTREGA_FINAL.md](ENTREGA_FINAL.md) — fonte editável e versionável.
+- [RESPOSTAS_FORMULARIO.md](RESPOSTAS_FORMULARIO.md) — respostas curtas prontas para colar, com contagem de caracteres.
 
 Para preservar a paginação oficial em seis páginas:
 
